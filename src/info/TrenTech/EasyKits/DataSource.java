@@ -83,26 +83,6 @@ public class DataSource extends SQLMethods{
 	}
 
 	public boolean kitEquip(Player player, String kitName){
-		if(player.hasPermission("EasyKits.kits.maxuse") && !player.isOp()){
-			File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
-			YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
-			int maxUse = plugin.getConfig().getInt("Max-Number-Of-Uses");
-			int playerMaxUse = 0;
-			if(playerConfig.getString(kitName + ".Max-Use") != null){
-				playerMaxUse = playerConfig.getInt(kitName + ".Max-Use");
-			}
-			if( playerMaxUse < maxUse){
-				playerConfig.set(kitName + ".Max-Use", playerMaxUse + 1);
-				try {
-					playerConfig.save(file);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}else{
-				player.sendMessage(ChatColor.RED + "You have reached the max number of uses for this kit!");
-				return false;
-			}
-		}
 		ItemStack[] inv = getKitInventory(kitName);
 		ItemStack[] arm = getKitArmor(kitName);
 		ItemStack[] oldInv = player.getInventory().getContents();
@@ -196,7 +176,7 @@ public class DataSource extends SQLMethods{
 	public void revertChanges(Player player, ItemStack[] oldInv, ItemStack[] oldArm){
 		player.getInventory().setContents(oldInv);
 		player.getInventory().setArmorContents(oldArm);
-		player.sendMessage(ChatColor.RED + "Insufficient Inventory Space!");
+		player.sendMessage(ChatColor.RED + "Insufficient inventory space!");
 	}
 	
 	public void saveConfig(File file, YamlConfiguration config) {
@@ -212,16 +192,45 @@ public class DataSource extends SQLMethods{
 		}
 	}
 	
-	public void timedEquip(final Player player, final String kitName){
-		final int cooldown = plugin.getConfig().getInt("Cooldown-Delay");
-		player.sendMessage("Cooldown initiated! Please wait " + cooldown + " seconds!");
-		plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable(){
-			public void run(){
+	public void doKitEquipCheck(final Player player, final String kitName){
+		boolean b = true;
+		if(player.hasPermission("EasyKits.kits.maxuse") && !player.isOp()){
+			File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
+			YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
+			int maxUse = plugin.getConfig().getInt("Max-Number-Of-Uses");
+			int playerMaxUse = 0;
+			if(playerConfig.getString(kitName + ".Max-Use") != null){
+				playerMaxUse = playerConfig.getInt(kitName + ".Max-Use");
+			}
+			if( playerMaxUse < maxUse){
+				playerConfig.set(kitName + ".Max-Use", playerMaxUse + 1);
+				try {
+					playerConfig.save(file);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}else{
+				player.sendMessage(ChatColor.RED + "You have reached the max number of uses for this kit!");
+				b = false;
+			}
+		}
+		if(b == true){
+			if(player.hasPermission("EasyKits.kits.cooldown") && !player.isOp()){
+				final int cooldown = plugin.getConfig().getInt("Cooldown-Delay");
+				player.sendMessage(ChatColor.YELLOW + "Cooldown initiated! Please wait " + cooldown + " seconds!");
+				plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable(){
+					public void run(){
+						if(DataSource.instance.kitEquip(player, kitName)){
+							player.sendMessage(ChatColor.GREEN + "Kit Equipped!");
+						}				
+					}
+				}, 20*cooldown);
+			}else{
 				if(DataSource.instance.kitEquip(player, kitName)){
 					player.sendMessage(ChatColor.GREEN + "Kit Equipped!");
-				}				
+				}	
 			}
-		}, 20*cooldown);
+		}
 	}
 	
 }

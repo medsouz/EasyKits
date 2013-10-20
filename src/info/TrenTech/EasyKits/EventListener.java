@@ -1,8 +1,6 @@
 package info.TrenTech.EasyKits;
 
 import java.io.File;
-
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,17 +19,11 @@ public class EventListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerClickEvent(InventoryClickEvent event){
 		if(event.getInventory().getTitle().contains("Kit:")){
+			event.setCancelled(true);
 			Player player = (Player) event.getWhoClicked();
 			String kitName = event.getInventory().getTitle().replace("Kit: ", "");
-			event.setCancelled(true);
 			if(event.getSlot() == 44){
-				if(player.hasPermission("EasyKits.kits.cooldown") && !player.isOp()){
-					DataSource.instance.timedEquip(player, kitName);
-				}else{
-					if(DataSource.instance.kitEquip(player, kitName)){
-						player.sendMessage(ChatColor.GREEN + "Kit Equipped!");
-					}
-				}
+				DataSource.instance.doKitEquipCheck(player, kitName);
 				player.closeInventory();
 			}
 		}

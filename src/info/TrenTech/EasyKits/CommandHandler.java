@@ -91,7 +91,27 @@ public class CommandHandler implements CommandExecutor {
 					
 				}else if(args[0].equalsIgnoreCase("give")){
 					if(sender.hasPermission("EasyKits.cmd.give")){
-						
+						if(args.length == 3){
+							if(this.plugin.getServer().getPlayer(args[1]) != null){
+								Player player = this.plugin.getServer().getPlayer(args[1]);
+								if(DataSource.instance.kitExist(args[2])){
+									if(DataSource.instance.kitEquip(player, args[2])){
+										sender.sendMessage(ChatColor.GREEN + "gave kit to " + args[1]);
+										player.sendMessage(ChatColor.GREEN + sender.getName() + " gave you a kit!");
+									}else{
+										sender.sendMessage(ChatColor.RED + "Player has insufficient inventory space!");
+									}
+								}else{
+									sender.sendMessage(ChatColor.RED + "Kit does not exist!");
+								}
+							}else{
+								sender.sendMessage(ChatColor.RED + "Player does not exist! Make sure they are online!");
+							}
+						}else{
+							sender.sendMessage(ChatColor.YELLOW + "/kit give [player] [kitname]");
+						}
+					}else{
+						sender.sendMessage(ChatColor.RED + "You do not have permission!");
 					}
 					
 				}else if(args[0].equalsIgnoreCase("list")){
@@ -150,13 +170,7 @@ public class CommandHandler implements CommandExecutor {
 						Player player = (Player)sender;
 						if(DataSource.instance.kitExist(args[0])){
 							if((DataSource.instance.getKitType(args[0]).equalsIgnoreCase("Default") && player.hasPermission("EasyKits.kits." + args[0])) || (DataSource.instance.getKitType(args[0]).equalsIgnoreCase(player.getName()) || (DataSource.instance.getKitType(args[0]).equalsIgnoreCase("Public")))){							
-								if(player.hasPermission("EasyKits.kits.cooldown") && !player.isOp()){
-									DataSource.instance.timedEquip(player, args[0]);
-								}else{
-									if(DataSource.instance.kitEquip(player, args[0])){
-										player.sendMessage(ChatColor.GREEN + "Kit Equipped!");
-									}
-								}
+								DataSource.instance.doKitEquipCheck(player, args[0]);
 							}else{
 								player.sendMessage(ChatColor.RED + "You do not have permission to obtain this kit!");
 							}
