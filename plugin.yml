@@ -1,0 +1,42 @@
+name: EasyKits
+main: info.TrenTech.EasyKits.EasyKits
+version: 1.0.0
+commands:
+  kit:
+    usage: /<command>
+permissions:
+  EasyKits.*:
+    default: op
+    children:
+      EasyKits.cmd.*: true
+      EastKits.kits.*: true
+  EasyKits.cmd.*:
+    default: op
+    children:     
+      EasyKits.cmd.reload: true
+      EasyKits.cmd.create: true
+      EasyKits.cmd.remove: true
+      EasyKits.cmd.give: true
+      EasyKits.cmd.kitname: true
+      EasyKits.cmd.list: true
+      EasyKits.cmd.show: true
+  EasyKits.cmd.reload:
+    default: op
+  EasyKits.cmd.create:
+    default: op
+  EasyKits.cmd.remove:
+    default: op
+  EasyKits.cmd.give:
+    default: op
+  EasyKits.cmd.kitname:
+    default: op
+  EasyKits.cmd.list:
+    default: op
+  EasyKits.cmd.show:
+    default: op
+  EasyKits.kits.*:
+    default: op
+  EasyKits.kits.cooldown:
+    default: false
+  EasyKits.kits.maxuse:
+    default: false
