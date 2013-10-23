@@ -110,7 +110,16 @@ public class CommandHandler implements CommandExecutor {
 					}else{
 						sender.sendMessage(ChatColor.RED + "Must be a player!");
 					}
-					
+				}else if(args[0].equalsIgnoreCase("list")){
+					if(sender.hasPermission("EasyKits.cmd.list")){
+						String[] list = DataSource.instance.getKitList();
+						sender.sendMessage(ChatColor.UNDERLINE +""+ ChatColor.GREEN + "Kits:");
+						for(String kit : list){
+							sender.sendMessage(ChatColor.YELLOW + "- " + kit);
+						}						
+					}else{
+						sender.sendMessage("You do not have Permission");
+					}
 				}else if(args[0].equalsIgnoreCase("show")){
 					if(sender instanceof Player){
 						Player player = (Player)sender;
