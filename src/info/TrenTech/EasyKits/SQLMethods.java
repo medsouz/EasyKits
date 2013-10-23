@@ -30,7 +30,7 @@ public abstract class SQLMethods extends SQLUtils{
 		synchronized (lock) {
 			try {
 				PreparedStatement statement;	
-				statement = prepare("CREATE TABLE kits( id INTEGER PRIMARY KEY, Kit TEXT, Type TEXT, Inventory BLOB, Armor BLOB)");
+				statement = prepare("CREATE TABLE kits( id INTEGER PRIMARY KEY, Kit TEXT, Inventory BLOB, Armor BLOB)");
 				statement.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Unable to connect to Database!");
@@ -57,14 +57,13 @@ public abstract class SQLMethods extends SQLUtils{
 		return b;
 	}
 	
-	public void createKit(String kitName, String type, byte[] inv, byte[] armor) {
+	public void createKit(String kitName, byte[] inv, byte[] armor) {
 		synchronized (lock) {
 			try {
-				PreparedStatement statement = prepare("INSERT into kits (Kit, Type, Inventory, Armor) VALUES (?, ?, ?, ?)");	
+				PreparedStatement statement = prepare("INSERT into kits (Kit, Inventory, Armor) VALUES (?, ?, ?)");	
 				statement.setString(1, kitName);
-				statement.setString(2, type);
-				statement.setBytes(3, inv);
-				statement.setBytes(4, armor);
+				statement.setBytes(2, inv);
+				statement.setBytes(3, armor);
 				statement.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Unable to connect to Database!");
@@ -73,15 +72,9 @@ public abstract class SQLMethods extends SQLUtils{
 		}
 	}
 	
-	public void saveKit(String kitName, String type, byte[] inv, byte[] armor) {
+	public void saveKit(String kitName, byte[] inv, byte[] armor) {
 		synchronized (lock) {
 			try {
-				if(type != null){
-					PreparedStatement statement = prepare("UPDATE kits SET Type = ? WHERE Kit = ?");				
-					statement.setString(1, type);
-					statement.setString(2, kitName);
-					statement.executeUpdate();
-				}
 				if(inv != null){
 					PreparedStatement statement = prepare("UPDATE kits SET Inventory = ? WHERE Kit = ?");				
 					statement.setBytes(1, inv);
@@ -135,24 +128,6 @@ public abstract class SQLMethods extends SQLUtils{
 			System.out.println(ex.getMessage());
 		}
 		return armor;
-	}
-	
-	public String getKitType(String kitName) {
-		String type = null;
-		try {
-			PreparedStatement statement = prepare("SELECT * FROM kits");
-			ResultSet rs = statement.executeQuery();
-			while (rs.next()){
-				if (rs.getString("Kit").equalsIgnoreCase(kitName)) {
-					type = rs.getString("Type");
-					break;
-				}
-			}	
-		} catch (SQLException ex) {
-			System.out.println("Unable to connect to Database!");
-			System.out.println(ex.getMessage());
-		}
-		return type;
 	}
 	
 	public String[] getKitList() {

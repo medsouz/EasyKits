@@ -1,6 +1,12 @@
 package info.TrenTech.EasyKits;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import info.TrenTech.EasyKits.EventListener;
 import info.TrenTech.EasyKits.CommandHandler;
@@ -38,6 +44,28 @@ public class EasyKits extends JavaPlugin{
 			log.warning(String.format("[%s] Creating database!", new Object[] {getDescription().getName()}));
 		}
     }
+    
+	public static enum Items{
+		Kits;
+	}
+	
+	public static ItemStack getCustomItem(Items item){
+		ItemStack itemStack = null;
+		ItemMeta itemMeta;
+		ArrayList<String> lore;
+		switch (item){
+		case Kits:
+			itemStack = new ItemStack(Material.BOOK, 1);
+			itemMeta = itemStack.getItemMeta();
+			itemMeta.setDisplayName("Kits");
+			lore = new ArrayList<String>();
+			lore.clear();
+			lore.add(ChatColor.GREEN + "Big ol list of Kits!");
+			itemMeta.setLore(lore);
+			itemStack.setItemMeta(itemMeta);
+		}
+		return itemStack;
+	}
     
     @Override
     public void onDisable(){
