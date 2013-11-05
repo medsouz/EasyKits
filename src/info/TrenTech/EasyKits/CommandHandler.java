@@ -114,8 +114,11 @@ public class CommandHandler implements CommandExecutor {
 					if(sender.hasPermission("EasyKits.cmd.list")){
 						String[] list = DataSource.instance.getKitList();
 						sender.sendMessage(ChatColor.UNDERLINE +""+ ChatColor.GREEN + "Kits:");
+						String joinKit = this.plugin.getConfig().getString("First-Join-Kit");
 						for(String kit : list){
-							sender.sendMessage(ChatColor.YELLOW + "- " + kit);
+							if(sender.hasPermission("EasyKits.kits." + kit) || kit.equalsIgnoreCase(joinKit)){
+								sender.sendMessage(ChatColor.YELLOW + "- " + kit);
+							}					
 						}						
 					}else{
 						sender.sendMessage("You do not have Permission");
@@ -135,7 +138,7 @@ public class CommandHandler implements CommandExecutor {
 				}else if(args.length == 1){				
 					if(sender instanceof Player){
 						Player player = (Player)sender;
-						if(DataSource.instance.kitExist(args[0])){						
+						if(DataSource.instance.kitExist(args[0])){				
 							DataSource.instance.doKitEquipCheck(player, args[0]);
 						}else{
 							player.sendMessage(ChatColor.RED + "Kit does not exist!");

@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -27,18 +26,11 @@ public class DataSource extends SQLMethods{
 	public static DataSource instance = new DataSource(plugin);
 	
 	public void saveKit(String kitName, ItemStack[] invArray, ItemStack[] armorArray){
-		List<ItemStack> itemList = new ArrayList<ItemStack>();
-		for(ItemStack item : invArray){
-			//if(item != null){
-				itemList.add(item);
-			//}
-		}
-		ItemStack[] newInvArray = itemList.toArray(new ItemStack[itemList.size()]);
 		ByteArrayOutputStream inv = new ByteArrayOutputStream();
 		ByteArrayOutputStream armor = new ByteArrayOutputStream();
 	    try {
 	        BukkitObjectOutputStream invObjOS = new BukkitObjectOutputStream(inv);
-	        invObjOS.writeObject(newInvArray);
+	        invObjOS.writeObject(invArray);
 	        invObjOS.close();
 	        BukkitObjectOutputStream armorObjOS = new BukkitObjectOutputStream(armor);
 	        armorObjOS.writeObject(armorArray);
@@ -206,7 +198,7 @@ public class DataSource extends SQLMethods{
 			file.createNewFile();
 			config.save(file);
 		} catch (IOException e) {
-			System.err.println("[MoneyDrop] Error writing config");
+			System.err.println("Error writing config");
 			e.printStackTrace();
 		}
 	}
@@ -240,13 +232,13 @@ public class DataSource extends SQLMethods{
 				plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable(){
 					public void run(){
 						if(DataSource.instance.kitEquip(player, kitName)){
-							player.sendMessage(ChatColor.GREEN + "Kit Equipped!");
+							player.sendMessage(ChatColor.GREEN + "Kit equipped!");
 						}				
 					}
 				}, 20*cooldown);
 			}else{
 				if(DataSource.instance.kitEquip(player, kitName)){
-					player.sendMessage(ChatColor.GREEN + "Kit Equipped!");
+					player.sendMessage(ChatColor.GREEN + "Kit equipped!");
 				}	
 			}
 		}

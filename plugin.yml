@@ -1,6 +1,6 @@
 name: EasyKits
 main: info.TrenTech.EasyKits.EasyKits
-version: 1.1.1
+version: 1.1.2
 commands:
   kit:
     usage: /<command>
@@ -17,7 +17,6 @@ permissions:
       EasyKits.cmd.create: true
       EasyKits.cmd.remove: true
       EasyKits.cmd.give: true
-      EasyKits.cmd.kitname: true
       EasyKits.cmd.list: true
       EasyKits.cmd.show: true
   EasyKits.cmd.reload:
@@ -27,8 +26,6 @@ permissions:
   EasyKits.cmd.remove:
     default: op
   EasyKits.cmd.give:
-    default: op
-  EasyKits.cmd.kitname:
     default: op
   EasyKits.cmd.list:
     default: op
