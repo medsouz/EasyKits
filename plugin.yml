@@ -1,6 +1,6 @@
 name: EasyKits
 main: info.TrenTech.EasyKits.EasyKits
-version: 1.1.2
+version: 1.2.2
 commands:
   kit:
     usage: /<command>
@@ -37,3 +37,5 @@ permissions:
     default: false
   EasyKits.kits.maxuse:
     default: false
+  EasyKits.kits.bypassprice:
+    default: op

@@ -43,13 +43,19 @@ public class CommandHandler implements CommandExecutor {
 								if(!DataSource.instance.kitExist(args[1])){
 									ItemStack[] inv = player.getInventory().getContents();
 									ItemStack[] arm = player.getInventory().getArmorContents();
-									DataSource.instance.saveKit(args[1], inv, arm);
+									DataSource.instance.saveKit(args[1], inv, arm, 0);
 									player.sendMessage(ChatColor.GREEN + "Kit saved!");
 								}else{
 									player.sendMessage(ChatColor.RED + args[1] + " already exists!");
 								}
+							}else if(args.length == 3 && isInt(args[2])){
+								ItemStack[] inv = player.getInventory().getContents();
+								ItemStack[] arm = player.getInventory().getArmorContents();
+								DataSource.instance.saveKit(args[1], inv, arm, Double.parseDouble(args[2]));
+								player.sendMessage(ChatColor.GREEN + "Kit saved!");
 							}else{
 								player.sendMessage(ChatColor.YELLOW + "/kit create [kitname]");
+								player.sendMessage(ChatColor.YELLOW + "/kit create [kitname] [price]");
 							}
 						}else{
 							sender.sendMessage("You do not have permission!");
@@ -117,7 +123,13 @@ public class CommandHandler implements CommandExecutor {
 						String joinKit = this.plugin.getConfig().getString("First-Join-Kit");
 						for(String kit : list){
 							if(sender.hasPermission("EasyKits.kits." + kit) || kit.equalsIgnoreCase(joinKit)){
-								sender.sendMessage(ChatColor.YELLOW + "- " + kit);
+								double price = DataSource.instance.getKitPrice(kit);
+								if(price > 0){
+									sender.sendMessage(ChatColor.YELLOW + "- " + kit + ": " + ChatColor.GREEN + "$" + price);	
+								}else{
+									sender.sendMessage(ChatColor.YELLOW + "- " + kit);	
+								}
+								
 							}					
 						}						
 					}else{
@@ -161,6 +173,14 @@ public class CommandHandler implements CommandExecutor {
 		}
 		return true;
 	}
+
+public boolean isInt(String str) {
+	try {
+		Integer.parseInt(str);
+		return true;
+	} catch (NumberFormatException e) {}
+	return false;
+}
 
 	
 }

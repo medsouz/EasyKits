@@ -25,7 +25,7 @@ public class DataSource extends SQLMethods{
 	
 	public static DataSource instance = new DataSource(plugin);
 	
-	public void saveKit(String kitName, ItemStack[] invArray, ItemStack[] armorArray){
+	public void saveKit(String kitName, ItemStack[] invArray, ItemStack[] armorArray, double price){
 		ByteArrayOutputStream inv = new ByteArrayOutputStream();
 		ByteArrayOutputStream armor = new ByteArrayOutputStream();
 	    try {
@@ -39,9 +39,9 @@ public class DataSource extends SQLMethods{
 	        ioexception.printStackTrace();
 	    }
 	    if(getKitInv(kitName) == null){
-	    	createKit(kitName, inv.toByteArray(), armor.toByteArray());
+	    	createKit(kitName, inv.toByteArray(), armor.toByteArray(), price);
 	    }else{
-		    saveKit(kitName, inv.toByteArray(), armor.toByteArray());	
+		    saveKitSQL(kitName, inv.toByteArray(), armor.toByteArray(), price);	
 	    }
 	}
 	
@@ -231,16 +231,38 @@ public class DataSource extends SQLMethods{
 				player.sendMessage(ChatColor.YELLOW + "Cooldown initiated! Please wait " + cooldown + " seconds!");
 				plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable(){
 					public void run(){
-						if(DataSource.instance.kitEquip(player, kitName)){
-							player.sendMessage(ChatColor.GREEN + "Kit equipped!");
-						}				
+						if(plugin.econSupport && !player.hasPermission("EasyKits.kits.bypassprice")){
+							doKitEcon(player, kitName);
+						}else{
+							if(DataSource.instance.kitEquip(player, kitName)){
+								player.sendMessage(ChatColor.GREEN + "Kit equipped!");
+							}
+						}			
 					}
 				}, 20*cooldown);
 			}else{
-				if(DataSource.instance.kitEquip(player, kitName)){
-					player.sendMessage(ChatColor.GREEN + "Kit equipped!");
-				}	
+				if(plugin.econSupport && !player.hasPermission("EasyKits.kits.bypassprice")){
+					doKitEcon(player, kitName);
+				}else{
+					if(DataSource.instance.kitEquip(player, kitName)){
+						player.sendMessage(ChatColor.GREEN + "Kit equipped!");
+					}
+				}
 			}
+		}
+	}
+	
+	public void doKitEcon(Player player, String kitName){
+		double price = getKitPrice(kitName);
+		double balance = plugin.economy.getBalance(player.getName());
+		if(balance >= price){
+			if(DataSource.instance.kitEquip(player, kitName)){
+				plugin.economy.withdrawPlayer(player.getName(), price);
+				player.sendMessage(ChatColor.GREEN + "Charged $" + price);
+				player.sendMessage(ChatColor.GREEN + "Kit equipped!");
+			}
+		}else{
+			player.sendMessage(ChatColor.RED + "You need at least $" + price + "!");
 		}
 	}
 	

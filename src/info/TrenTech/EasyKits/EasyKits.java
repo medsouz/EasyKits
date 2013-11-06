@@ -3,10 +3,13 @@ package info.TrenTech.EasyKits;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import info.TrenTech.EasyKits.EventListener;
 import info.TrenTech.EasyKits.CommandHandler;
@@ -15,6 +18,8 @@ public class EasyKits extends JavaPlugin{
 	
 	public static EasyKits plugin;
 	public final Logger log = Logger.getLogger("Minecraft");
+	public Economy economy;
+	public boolean econSupport = true;
 	private EventListener eventlistener;
 	private CommandHandler cmdExecutor;
 	
@@ -31,17 +36,29 @@ public class EasyKits extends JavaPlugin{
 		this.cmdExecutor = new CommandHandler(this);
 		getCommand("kit").setExecutor(cmdExecutor);
 		
+		if (!setupEconomy()) {
+        	log.warning(String.format("[%s] Vault not found! Economy support disabled!", new Object[] {getDescription().getName()}));
+        	econSupport = false;
+		}else{
+			log.info(String.format("[%s] Vault found! Economy support enabled!", new Object[] { getDescription().getName() }));
+		}
+		
 		try {
 			DataSource.instance.connect();
 		} catch (Exception e) {
-        	log.severe(String.format("[%s] Disabled! Unable to connect to database!", new Object[] {getDescription().getName()}));
-			getServer().getPluginManager().disablePlugin(this);
-			return;
+            log.severe(String.format("[%s] Disabled! Unable to connect to database!", new Object[] {getDescription().getName()}));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
 		}
 		
 		if(!DataSource.instance.tableExist()){
 			DataSource.instance.createTable();
 			log.warning(String.format("[%s] Creating database!", new Object[] {getDescription().getName()}));
+		}
+		
+		if(!DataSource.instance.econColumnExist()){
+			DataSource.instance.createEconColumn();
+			log.warning(String.format("[%s] Upgrading database!", new Object[] {getDescription().getName()}));
 		}
     }
     
@@ -65,6 +82,19 @@ public class EasyKits extends JavaPlugin{
 			itemStack.setItemMeta(itemMeta);
 		}
 		return itemStack;
+	}
+	
+	private boolean setupEconomy() {
+		try{
+			Class.forName("net.milkbowl.vault.economy.Economy", false, getClassLoader());
+			RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(Economy.class);
+			if (economyProvider != null) {
+				economy = (Economy) economyProvider.getProvider();
+			}
+			return economy != null;
+		}catch(Exception e){
+			return false;
+		}
 	}
     
     @Override

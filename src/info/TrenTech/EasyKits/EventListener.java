@@ -1,6 +1,8 @@
 package info.TrenTech.EasyKits;
 
 import java.io.File;
+import java.util.ArrayList;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -87,6 +89,14 @@ public class EventListener implements Listener {
 							ItemStack kitItem = new ItemStack(Material.BOOK);
 							ItemMeta itemMeta = kitItem.getItemMeta();
 							itemMeta.setDisplayName("Kit: " + kit);
+							if(this.plugin.econSupport){
+								double price = DataSource.instance.getKitPrice(kit);
+								if(price > 0){
+									ArrayList<String> lore = new ArrayList<String>();
+									lore.add(ChatColor.GREEN + "$" + price);
+									itemMeta.setLore(lore);
+								}
+							}
 							kitItem.setItemMeta(itemMeta);
 							kits[index] = kitItem.clone();							
 						}
