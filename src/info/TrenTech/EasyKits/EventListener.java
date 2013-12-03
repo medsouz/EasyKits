@@ -27,22 +27,22 @@ public class EventListener implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerClickEvent(InventoryClickEvent event){
-		if(event.getInventory().getTitle().contains("Kit:")){
+		if(event.getInventory().getTitle().contains("EasyKits Kit:")){
 			event.setCancelled(true);
 			Player player = (Player) event.getWhoClicked();
-			String kitName = event.getInventory().getTitle().replace("Kit: ", "");
+			String kitName = event.getInventory().getTitle().replace("EasyKits Kit: ", "");
 			if(event.getSlot() == 44){
 				DataSource.instance.doKitEquipCheck(player, kitName);
 				player.closeInventory();
 			}
 		}
-		if(event.getInventory().getTitle().contains("Kits:")){
+		if(event.getInventory().getTitle().contains("EasyKits:")){
 			Player player = (Player) event.getWhoClicked();
 			if(event.getCurrentItem() != null){
 				if(event.getCurrentItem().getType() == Material.BOOK && event.getCurrentItem().hasItemMeta()){
 					if(event.getCurrentItem().getItemMeta().hasDisplayName()){
-						if(event.getCurrentItem().getItemMeta().getDisplayName().contains("Kit:")){
-							String kitName = event.getCurrentItem().getItemMeta().getDisplayName().replace("Kit: ", "");
+						if(event.getCurrentItem().getItemMeta().getDisplayName().contains("EasyKits Kit:")){
+							String kitName = event.getCurrentItem().getItemMeta().getDisplayName().replace("EasyKits Kit: ", "");
 							event.setCancelled(true);
 							String[] list = DataSource.instance.getKitList();
 							for(String kit : list){
@@ -78,8 +78,8 @@ public class EventListener implements Listener {
 		Player player = event.getPlayer();
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			if(player.getItemInHand().getType() == Material.BOOK && player.getItemInHand().getItemMeta().hasDisplayName()){
-				if(player.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase("Kits")){
-					Inventory kitInv = this.plugin.getServer().createInventory(player, 27, "Kits:");
+				if(player.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase("EasyKits")){
+					Inventory kitInv = this.plugin.getServer().createInventory(player, 27, "EasyKits:");
 					String[] list = DataSource.instance.getKitList();
 					ItemStack[] kits = new ItemStack[26];
 					int index = 0;
@@ -88,7 +88,7 @@ public class EventListener implements Listener {
 						if(player.hasPermission("EasyKits.kits." + kit) || kit.equalsIgnoreCase(joinKit)){
 							ItemStack kitItem = new ItemStack(Material.BOOK);
 							ItemMeta itemMeta = kitItem.getItemMeta();
-							itemMeta.setDisplayName("Kit: " + kit);
+							itemMeta.setDisplayName("EasyKits Kit: " + kit);
 							if(this.plugin.econSupport){
 								double price = DataSource.instance.getKitPrice(kit);
 								if(price > 0){

@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import info.TrenTech.EasyKits.EventListener;
@@ -74,10 +75,10 @@ public class EasyKits extends JavaPlugin{
 		case Kits:
 			itemStack = new ItemStack(Material.BOOK, 1);
 			itemMeta = itemStack.getItemMeta();
-			itemMeta.setDisplayName("Kits");
+			itemMeta.setDisplayName("EasyKits");
 			lore = new ArrayList<String>();
 			lore.clear();
-			lore.add(ChatColor.GREEN + "Big ol list of Kits!");
+			lore.add(ChatColor.GREEN + "Big ol list of kits!");
 			itemMeta.setLore(lore);
 			itemStack.setItemMeta(itemMeta);
 		}
@@ -85,14 +86,12 @@ public class EasyKits extends JavaPlugin{
 	}
 	
 	private boolean setupEconomy() {
-		try{
-			Class.forName("net.milkbowl.vault.economy.Economy", false, getClassLoader());
+		Plugin plugin = getServer().getPluginManager().getPlugin("Vault");
+		if(plugin != null){
 			RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(Economy.class);
-			if (economyProvider != null) {
-				economy = (Economy) economyProvider.getProvider();
-			}
-			return economy != null;
-		}catch(Exception e){
+			economy = (Economy) economyProvider.getProvider();
+			return true;
+		}else{
 			return false;
 		}
 	}

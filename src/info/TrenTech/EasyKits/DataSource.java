@@ -273,7 +273,7 @@ public class DataSource extends SQLMethods{
 				ItemStack[] arm = DataSource.instance.getKitArmor(kitName);
 				String joinKit = plugin.getConfig().getString("First-Join-Kit");
 				if(player.hasPermission("EasyKits.kits." + kitName) || kitName.equalsIgnoreCase(joinKit)){
-					Inventory showInv = plugin.getServer().createInventory(player, 45, "Kit: " + kitName);
+					Inventory showInv = plugin.getServer().createInventory(player, 45, "EasyKits Kit: " + kitName);
 					showInv.setContents(inv);								
 					int index = 36;
 					for(ItemStack a : arm){

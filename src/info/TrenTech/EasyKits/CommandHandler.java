@@ -58,7 +58,7 @@ public class CommandHandler implements CommandExecutor {
 								player.sendMessage(ChatColor.YELLOW + "/kit create [kitname] [price]");
 							}
 						}else{
-							sender.sendMessage("You do not have permission!");
+							sender.sendMessage(ChatColor.RED + "You do not have permission!");
 						}
 					}else{
 						sender.sendMessage(ChatColor.RED + "Must be a player!");
@@ -133,7 +133,7 @@ public class CommandHandler implements CommandExecutor {
 							}					
 						}						
 					}else{
-						sender.sendMessage("You do not have Permission");
+						sender.sendMessage(ChatColor.RED + "You do not have Permission");
 					}
 				}else if(args[0].equalsIgnoreCase("show")){
 					if(sender instanceof Player){
@@ -162,7 +162,7 @@ public class CommandHandler implements CommandExecutor {
 				
 			}else{
 				sender.sendMessage(ChatColor.GREEN + "Command List:");
-				sender.sendMessage(ChatColor.YELLOW + "/kit create [kitname]");
+				sender.sendMessage(ChatColor.YELLOW + "/kit create [kitname] <price>");
 				sender.sendMessage(ChatColor.YELLOW + "/kit remove [kitname]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit book");
 				sender.sendMessage(ChatColor.YELLOW + "/kit show [kitname]");
@@ -174,13 +174,12 @@ public class CommandHandler implements CommandExecutor {
 		return true;
 	}
 
-public boolean isInt(String str) {
-	try {
-		Integer.parseInt(str);
-		return true;
-	} catch (NumberFormatException e) {}
-	return false;
-}
-
+	public boolean isInt(String str) {
+		try {
+			Integer.parseInt(str);
+			return true;
+		} catch (NumberFormatException e) {}
+		return false;
+	}
 	
 }
