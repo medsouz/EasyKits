@@ -4,8 +4,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -25,7 +31,7 @@ public class DataSource extends SQLMethods{
 	
 	public static DataSource instance = new DataSource(plugin);
 	
-	public void saveKit(String kitName, ItemStack[] invArray, ItemStack[] armorArray, double price){
+	public void saveKit(String kitName, ItemStack[] invArray, ItemStack[] armorArray){
 		ByteArrayOutputStream inv = new ByteArrayOutputStream();
 		ByteArrayOutputStream armor = new ByteArrayOutputStream();
 	    try {
@@ -39,9 +45,9 @@ public class DataSource extends SQLMethods{
 	        ioexception.printStackTrace();
 	    }
 	    if(getKitInv(kitName) == null){
-	    	createKit(kitName, inv.toByteArray(), armor.toByteArray(), price);
+	    	createKit(kitName, inv.toByteArray(), armor.toByteArray());
 	    }else{
-		    saveKitSQL(kitName, inv.toByteArray(), armor.toByteArray(), price);	
+		    saveKitSQL(kitName, inv.toByteArray(), armor.toByteArray());	
 	    }
 	}
 	
@@ -79,7 +85,7 @@ public class DataSource extends SQLMethods{
 	
 	public boolean kitEquip(Player player, String kitName){
 		String joinKit = plugin.getConfig().getString("First-Join-Kit");
-		if(player.hasPermission("EasyKits.kits." + kitName) || kitName.equalsIgnoreCase(joinKit)){
+		if(player.hasPermission("EasyKits.kits." + kitName) || kitName.equalsIgnoreCase(joinKit) || player.hasPermission("EasyKits.kits.*")){
 			ItemStack[] inv = getKitInventory(kitName);
 			ItemStack[] arm = getKitArmor(kitName);
 			ItemStack[] oldInv = player.getInventory().getContents();
@@ -178,7 +184,7 @@ public class DataSource extends SQLMethods{
 				index++;			
 			}
 		}else{
-			player.sendMessage(ChatColor.RED + "You do not have permission!");
+			player.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
 			return false;
 		}
 		return true;
@@ -187,7 +193,7 @@ public class DataSource extends SQLMethods{
 	public void revertChanges(Player player, ItemStack[] oldInv, ItemStack[] oldArm){
 		player.getInventory().setContents(oldInv);
 		player.getInventory().setArmorContents(oldArm);
-		player.sendMessage(ChatColor.RED + "Insufficient inventory space!");
+		player.sendMessage(ChatColor.DARK_RED + "Insufficient inventory space!");
 	}
 	
 	public void saveConfig(File file, YamlConfiguration config) {
@@ -204,65 +210,142 @@ public class DataSource extends SQLMethods{
 	}
 	
 	public void doKitEquipCheck(final Player player, final String kitName){
-		boolean b = true;
+		boolean cooldown = true;
+		boolean maxUse = true;
+		boolean charge = true;		
+		boolean pass = true;
 		if(player.hasPermission("EasyKits.kits.maxuse") && !player.isOp()){
-			File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
-			YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
-			int maxUse = plugin.getConfig().getInt("Max-Number-Of-Uses");
-			int playerMaxUse = 0;
-			if(playerConfig.getString(kitName + ".Max-Use") != null){
-				playerMaxUse = playerConfig.getInt(kitName + ".Max-Use");
+			if(!doMaxUseCheck(player, kitName)){
+				pass = false;
 			}
-			if( playerMaxUse < maxUse){
-				playerConfig.set(kitName + ".Max-Use", playerMaxUse + 1);
-				try {
-					playerConfig.save(file);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}else{
-				player.sendMessage(ChatColor.RED + "You have reached the max number of uses for this kit!");
-				b = false;
-			}
+		}else{
+			maxUse = false;
 		}
-		if(b == true){
-			if(player.hasPermission("EasyKits.kits.cooldown") && !player.isOp()){
-				final int cooldown = plugin.getConfig().getInt("Cooldown-Delay");
-				player.sendMessage(ChatColor.YELLOW + "Cooldown initiated! Please wait " + cooldown + " seconds!");
-				plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable(){
-					public void run(){
-						if(plugin.econSupport && !player.hasPermission("EasyKits.kits.bypassprice")){
-							doKitEcon(player, kitName);
-						}else{
-							if(DataSource.instance.kitEquip(player, kitName)){
-								player.sendMessage(ChatColor.GREEN + "Kit equipped!");
-							}
-						}			
-					}
-				}, 20*cooldown);
-			}else{
-				if(plugin.econSupport && !player.hasPermission("EasyKits.kits.bypassprice")){
-					doKitEcon(player, kitName);
-				}else{
-					if(DataSource.instance.kitEquip(player, kitName)){
-						player.sendMessage(ChatColor.GREEN + "Kit equipped!");
-					}
+		if(player.hasPermission("EasyKits.kits.cooldown") && !player.isOp()){
+			if(!doCooldownCheck(player, kitName)){
+				pass = false;
+			}
+		}else{
+			cooldown = false;
+		}
+		if(plugin.econSupport && !player.hasPermission("EasyKits.kits.bypassprice")){
+			if(!doPriceCheck(player, kitName)){
+				pass = false;
+			}
+		}else{
+			charge = false;
+		}
+		if(pass){
+			if(DataSource.instance.kitEquip(player, kitName)){
+				if(maxUse){
+					setMaxUse(player, kitName);
 				}
+				if(cooldown){
+					setCooldown(player.getName(), kitName);
+				}
+				if(charge){
+					doKitCharge(player, kitName);
+				}
+				player.sendMessage(ChatColor.DARK_GREEN + "Kit equipped!");
 			}
 		}
 	}
 	
-	public void doKitEcon(Player player, String kitName){
+	public boolean doMaxUseCheck(Player player, String kitName){
+		boolean b = true;
+		File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
+		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
+		int maxUse = plugin.getConfig().getInt("Max-Number-Of-Uses");
+		int playerMaxUse = 0;
+		if(playerConfig.getString(kitName + ".Max-Use") != null){
+			playerMaxUse = playerConfig.getInt(kitName + ".Max-Use");
+			if( playerMaxUse >= maxUse){
+				player.sendMessage(ChatColor.DARK_RED + "You have reached the max number of uses for this kit!");
+				b = false;
+			}			
+		}		
+		return b;
+	}
+
+	public void setMaxUse(Player player, String kitName){
+		File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
+		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
+		int playerMaxUse = 0;
+		if(playerConfig.getString(kitName + ".Max-Use") != null){
+			playerMaxUse = playerConfig.getInt(kitName + ".Max-Use");
+		}
+		playerConfig.set(kitName + ".Max-Use", playerMaxUse + 1);
+		try {
+			playerConfig.save(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean doCooldownCheck(Player player, String kitName){
+		boolean b = true;
+		File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
+		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
+		if(playerConfig.getString(kitName + ".Cooldown") != null){
+			String playerKitCooldown = playerConfig.getString(kitName + ".Cooldown");
+			String kitCooldown = getKitCooldown(kitName);
+			Date date = new Date();
+			Date cooldownDate = null;
+			try {
+				cooldownDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(playerKitCooldown);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			long compare = TimeUnit.MILLISECONDS.toSeconds(date.getTime() - cooldownDate.getTime());
+			int time = 0;
+			if(kitCooldown.matches("(^\\d*)(?i)[s]$")){
+				time = Integer.parseInt(kitCooldown.replace("s", ""));
+			}else if(kitCooldown.matches("(^\\d*)(?i)[m]$")){
+				time = Integer.parseInt(kitCooldown.replace("m", "")) * 60;
+			}else if(kitCooldown.matches("(^\\d*)(?i)[h]$")){
+				time = Integer.parseInt(kitCooldown.replace("h", "")) * 3600;
+			}else if(kitCooldown.matches("(^\\d*)(?i)[d]$")){
+				time = Integer.parseInt(kitCooldown.replace("d", "")) * 86400;
+			}	
+			if(!(time - compare <= 0)){
+				b = false;
+				String remaining = formatTime((int) (time - compare));
+				player.sendMessage(ChatColor.DARK_RED + "You must wait " + remaining + "before you can use this kit again!");
+			}
+		}
+		return b;
+	}
+	
+	public void setCooldown(String playerName, String kitName){
+		File file = new File(plugin.getDataFolder() + "/players/", playerName + ".yml");
+		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date date = new Date();
+		String strDate = dateFormat.format(date).toString();
+		playerConfig.set(kitName + ".Cooldown", strDate);
+		try {
+			playerConfig.save(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean doPriceCheck(Player player, String kitName){
+		boolean b = true;
 		double price = getKitPrice(kitName);
 		double balance = plugin.economy.getBalance(player.getName());
-		if(balance >= price){
-			if(DataSource.instance.kitEquip(player, kitName)){
-				plugin.economy.withdrawPlayer(player.getName(), price);
-				player.sendMessage(ChatColor.GREEN + "Charged $" + price);
-				player.sendMessage(ChatColor.GREEN + "Kit equipped!");
-			}
-		}else{
-			player.sendMessage(ChatColor.RED + "You need at least $" + price + "!");
+		if(balance < price){
+			b = false;
+			player.sendMessage(ChatColor.DARK_RED + "You need at least $" + price + "!");
+		}
+		return b;
+	}
+	
+	public void doKitCharge(Player player, String kitName){
+		double price = getKitPrice(kitName);
+		if(price != 0){
+			plugin.economy.withdrawPlayer(player.getName(), price);
+			player.sendMessage(ChatColor.DARK_GREEN + "Charged $" + price);
 		}
 	}
 	
@@ -272,7 +355,7 @@ public class DataSource extends SQLMethods{
 				ItemStack[] inv = DataSource.instance.getKitInventory(kitName);
 				ItemStack[] arm = DataSource.instance.getKitArmor(kitName);
 				String joinKit = plugin.getConfig().getString("First-Join-Kit");
-				if(player.hasPermission("EasyKits.kits." + kitName) || kitName.equalsIgnoreCase(joinKit)){
+				if(player.hasPermission("EasyKits.kits." + kitName) || kitName.equalsIgnoreCase(joinKit) || player.hasPermission("EasyKits.kits.*")){
 					Inventory showInv = plugin.getServer().createInventory(player, 45, "EasyKits Kit: " + kitName);
 					showInv.setContents(inv);								
 					int index = 36;
@@ -291,11 +374,50 @@ public class DataSource extends SQLMethods{
 					player.openInventory(showInv);					
 				}
 			}else{
-				player.sendMessage(ChatColor.RED + "Kit does not Exist!");
+				player.sendMessage(ChatColor.DARK_RED + "Kit does not Exist!");
 			}
 		}else{
-			player.sendMessage(ChatColor.RED + "You do not have permission!");
+			player.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
 		}
 	}
 	
+	static String formatTime(int sec) {
+		int hours = sec / 3600;
+		int remainder = sec % 3600;
+		int minutes = remainder / 60;
+		int seconds = remainder % 60;
+		String time = null;
+		if(hours < 10 && hours > 0){
+			time = "0" + hours + " Hours ";
+		}else if(hours > 10){
+			time = hours + " Hours ";
+		}
+		if((minutes < 10 && minutes > 0) || (minutes == 0 && hours > 0)){
+			if(time != null){
+				time = time + "0" + minutes + " Minutes ";
+			}else{
+				time = "0" + minutes + " Minutes ";
+			}		
+		}else if(minutes > 10){
+			if(time != null){
+				time = time + minutes + " Minutes ";	
+			}else{
+				time = minutes + " Minutes ";
+			}			
+		}
+		if(seconds < 10 && seconds > 0){
+			if(time != null){
+				time = time + "0" + seconds + " Seconds ";
+			}else{
+				time = "0" + seconds + " Seconds ";
+			}		
+		}else if(seconds > 10){
+			if(time != null){
+				time = time + seconds + " Seconds ";
+			}else{
+				time = seconds + " Seconds ";
+			}			
+		}
+		return time;
+	}
 }

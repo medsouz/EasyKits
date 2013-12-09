@@ -18,7 +18,7 @@ public abstract class SQLMethods extends SQLUtils{
 		try {
 			Statement statement = getConnection().createStatement();
 			DatabaseMetaData md = statement.getConnection().getMetaData();
-			ResultSet rs = md.getColumns(null, null, "kits" , "price");
+			ResultSet rs = md.getColumns(null, null, "kits" , "Price");
 			if (rs.next()){
 				b = true;	
 			}		
@@ -30,7 +30,33 @@ public abstract class SQLMethods extends SQLUtils{
 		synchronized (lock) {
 			try {
 				PreparedStatement statement;	
-				statement = prepare("ALTER TABLE kits ADD price DOUBLE");
+				statement = prepare("ALTER TABLE kits ADD Price DOUBLE");
+				statement.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println("Unable to connect to Database!");
+				System.out.println(e.getMessage());
+			}
+		}	
+	}
+	
+	public boolean cooldownColumnExist() {
+		boolean b = false;
+		try {
+			Statement statement = getConnection().createStatement();
+			DatabaseMetaData md = statement.getConnection().getMetaData();
+			ResultSet rs = md.getColumns(null, null, "kits" , "Cooldown");
+			if (rs.next()){
+				b = true;	
+			}		
+		} catch (SQLException ex) { }
+		return b;
+	}
+	
+	public void createCooldownColumn(){
+		synchronized (lock) {
+			try {
+				PreparedStatement statement;	
+				statement = prepare("ALTER TABLE kits ADD Cooldown TEXT");
 				statement.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Unable to connect to Database!");
@@ -56,7 +82,7 @@ public abstract class SQLMethods extends SQLUtils{
 		synchronized (lock) {
 			try {
 				PreparedStatement statement;	
-				statement = prepare("CREATE TABLE kits( id INTEGER PRIMARY KEY, Kit TEXT, Inventory BLOB, Armor BLOB, Price DOUBLE)");
+				statement = prepare("CREATE TABLE kits( id INTEGER PRIMARY KEY, Kit TEXT, Inventory BLOB, Armor BLOB, Price DOUBLE, Cooldown TEXT)");
 				statement.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Unable to connect to Database!");
@@ -83,14 +109,14 @@ public abstract class SQLMethods extends SQLUtils{
 		return b;
 	}
 	
-	public void createKit(String kitName, byte[] inv, byte[] armor, double price) {
+	public void createKit(String kitName, byte[] inv, byte[] armor) {
 		synchronized (lock) {
 			try {
 				PreparedStatement statement = prepare("INSERT into kits (Kit, Inventory, Armor, Price) VALUES (?, ?, ?, ?)");	
 				statement.setString(1, kitName);
 				statement.setBytes(2, inv);
 				statement.setBytes(3, armor);
-				statement.setDouble(4, price);
+				statement.setDouble(4, 0);
 				statement.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Unable to connect to Database!");
@@ -99,7 +125,35 @@ public abstract class SQLMethods extends SQLUtils{
 		}
 	}
 	
-	public void saveKitSQL(String kitName, byte[] inv, byte[] armor, double price) {
+	public void setKitCooldown(String kitName, String cooldown){
+		synchronized (lock) {
+			try {
+				PreparedStatement statement = prepare("UPDATE kits SET Cooldown = ? WHERE Kit = ?");
+				statement.setString(1, cooldown);
+				statement.setString(2, kitName);
+				statement.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println("Unable to connect to Database!");
+				System.out.println(e.getMessage());
+			}
+		}
+	}
+	
+	public void setKitPrice(String kitName, double price){
+		synchronized (lock) {
+			try {
+				PreparedStatement statement = prepare("UPDATE kits SET Price = ? WHERE Kit = ?");
+				statement.setDouble(1, price);
+				statement.setString(2, kitName);
+				statement.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println("Unable to connect to Database!");
+				System.out.println(e.getMessage());
+			}
+		}
+	}
+	
+	public void saveKitSQL(String kitName, byte[] inv, byte[] armor) {
 		synchronized (lock) {
 			try {
 				if(inv != null){
@@ -113,11 +167,7 @@ public abstract class SQLMethods extends SQLUtils{
 					statement.setBytes(1, armor);
 					statement.setString(2, kitName);
 					statement.executeUpdate();
-				}
-				PreparedStatement statement = prepare("UPDATE kits SET Price = ? WHERE Kit = ?");
-				statement.setDouble(1, price);
-				statement.setString(2, kitName);
-				statement.executeUpdate();			
+				}		
 			} catch (SQLException e) {
 				System.out.println("Unable to connect to Database!");
 				System.out.println(e.getMessage());
@@ -177,6 +227,24 @@ public abstract class SQLMethods extends SQLUtils{
 			System.out.println(ex.getMessage());
 		}
 		return price;
+	}
+	
+	public String getKitCooldown(String kitName) {
+		String cooldown = null;
+		try {
+			PreparedStatement statement = prepare("SELECT * FROM kits");
+			ResultSet rs = statement.executeQuery();
+			while (rs.next()){
+				if (rs.getString("Kit").equalsIgnoreCase(kitName)) {
+					cooldown = rs.getString("Cooldown");
+					break;
+				}
+			}
+		} catch (SQLException ex) {
+			System.out.println("Unable to connect to Database!");
+			System.out.println(ex.getMessage());
+		}
+		return cooldown;
 	}
 	
 	public String[] getKitList() {

@@ -34,6 +34,7 @@ public class EasyKits extends JavaPlugin{
     	
     	getConfig().options().copyDefaults(true);
     	saveConfig();
+    
 		this.cmdExecutor = new CommandHandler(this);
 		getCommand("kit").setExecutor(cmdExecutor);
 		
@@ -61,6 +62,16 @@ public class EasyKits extends JavaPlugin{
 			DataSource.instance.createEconColumn();
 			log.warning(String.format("[%s] Upgrading database!", new Object[] {getDescription().getName()}));
 		}
+		
+		if(!DataSource.instance.cooldownColumnExist()){
+			DataSource.instance.createCooldownColumn();
+			log.warning(String.format("[%s] Upgrading database!", new Object[] {getDescription().getName()}));
+		}
+		
+    	if(getConfig().getString("Cooldown-Delay") != null){
+    		getConfig().set("Cooldown-Delay", null);
+    		saveConfig();
+    	}
     }
     
 	public static enum Items{
@@ -95,12 +106,4 @@ public class EasyKits extends JavaPlugin{
 			return false;
 		}
 	}
-    
-    @Override
-    public void onDisable(){
-    	DataSource.instance.dispose();
-    	log.info(String.format("[%s] Disabled Version %s", new Object[] {getDescription().getName(), getDescription().getVersion() }));
-    }
-    
 }
-

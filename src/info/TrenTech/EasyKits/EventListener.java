@@ -79,13 +79,24 @@ public class EventListener implements Listener {
 		if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			if(player.getItemInHand().getType() == Material.BOOK && player.getItemInHand().getItemMeta().hasDisplayName()){
 				if(player.getItemInHand().getItemMeta().getDisplayName().equalsIgnoreCase("EasyKits")){
-					Inventory kitInv = this.plugin.getServer().createInventory(player, 27, "EasyKits:");
+					Inventory kitInv = this.plugin.getServer().createInventory(player, 54, "EasyKits:");
 					String[] list = DataSource.instance.getKitList();
-					ItemStack[] kits = new ItemStack[26];
+					if(list.length <= 9){
+						kitInv = this.plugin.getServer().createInventory(player, 9, "EasyKits:");
+					}else if(list.length > 9 && list.length <= 18){
+						kitInv = this.plugin.getServer().createInventory(player, 18, "EasyKits:");
+					}else if(list.length > 18 && list.length <= 27){
+						kitInv = this.plugin.getServer().createInventory(player, 27, "EasyKits:");
+					}else if(list.length > 27 && list.length <= 36){
+						kitInv = this.plugin.getServer().createInventory(player, 36, "EasyKits:");
+					}else if(list.length > 36 && list.length <= 45){
+						kitInv = this.plugin.getServer().createInventory(player, 45, "EasyKits:");
+					}
 					int index = 0;
+					boolean warning = false;
 					String joinKit = this.plugin.getConfig().getString("First-Join-Kit");
 					for(String kit : list){
-						if(player.hasPermission("EasyKits.kits." + kit) || kit.equalsIgnoreCase(joinKit)){
+						if(player.hasPermission("EasyKits.kits." + kit) || kit.equalsIgnoreCase(joinKit) || player.hasPermission("EasyKits.kits.*")){
 							ItemStack kitItem = new ItemStack(Material.BOOK);
 							ItemMeta itemMeta = kitItem.getItemMeta();
 							itemMeta.setDisplayName("EasyKits Kit: " + kit);
@@ -98,12 +109,18 @@ public class EventListener implements Listener {
 								}
 							}
 							kitItem.setItemMeta(itemMeta);
-							kits[index] = kitItem.clone();							
+							if(index < 54){
+								kitInv.addItem(kitItem);
+							}else{
+								warning = true;
+							}					
 						}
 						index++;
-					}
-					kitInv.setContents(kits);								
+					}						
 					player.openInventory(kitInv);
+					if(warning == true){
+						player.sendMessage(ChatColor.DARK_PURPLE + "There are more kits than can kit in the book. Use /kit list!");
+					}
 				}
 			}
 		}
