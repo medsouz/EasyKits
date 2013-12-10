@@ -145,14 +145,13 @@ public class CommandHandler implements CommandExecutor {
 						sender.sendMessage(ChatColor.UNDERLINE +""+ ChatColor.DARK_GREEN + "Kits:");
 						String joinKit = this.plugin.getConfig().getString("First-Join-Kit");
 						for(String kit : list){
-							if(sender.hasPermission("EasyKits.kits." + kit) || kit.equalsIgnoreCase(joinKit)){
+							if(sender.hasPermission("EasyKits.kits." + kit) || kit.equalsIgnoreCase(joinKit) || sender.hasPermission("EasyKits.kits.*")){
 								double price = DataSource.instance.getKitPrice(kit);
 								if(price > 0){
 									sender.sendMessage(ChatColor.YELLOW + "- " + kit + ": " + ChatColor.DARK_GREEN + "$" + price);	
 								}else{
 									sender.sendMessage(ChatColor.YELLOW + "- " + kit);	
-								}
-								
+								}								
 							}					
 						}						
 					}else{
@@ -185,7 +184,7 @@ public class CommandHandler implements CommandExecutor {
 				
 			}else{
 				sender.sendMessage(ChatColor.DARK_GREEN + "Command List:");
-				sender.sendMessage(ChatColor.YELLOW + "/kit create [kitname] <price>");
+				sender.sendMessage(ChatColor.YELLOW + "/kit create [kitname]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit remove [kitname]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit cooldown [kitname] [cooldown]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit price [kitname] [price]");

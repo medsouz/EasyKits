@@ -310,7 +310,7 @@ public class DataSource extends SQLMethods{
 			if(!(time - compare <= 0)){
 				b = false;
 				String remaining = formatTime((int) (time - compare));
-				player.sendMessage(ChatColor.DARK_RED + "You must wait " + remaining + "before you can use this kit again!");
+				player.sendMessage(ChatColor.DARK_RED + "You must wait " + remaining + " before you can use this kit again!");
 			}
 		}
 		return b;
@@ -381,41 +381,52 @@ public class DataSource extends SQLMethods{
 		}
 	}
 	
-	static String formatTime(int sec) {
-		int hours = sec / 3600;
-		int remainder = sec % 3600;
-		int minutes = remainder / 60;
-		int seconds = remainder % 60;
+	static String formatTime(int timeInSec) {
+		int days = timeInSec / 86400;
+		int dRemainder = timeInSec % 86400;
+		int hours = dRemainder / 3600;
+		int hRemainder = dRemainder % 3600;
+		int minutes = hRemainder / 60;
+		int seconds = hRemainder % 60;
 		String time = null;
-		if(hours < 10 && hours > 0){
-			time = "0" + hours + " Hours ";
-		}else if(hours > 10){
-			time = hours + " Hours ";
-		}
-		if((minutes < 10 && minutes > 0) || (minutes == 0 && hours > 0)){
+		if(days > 0){
+			String dys = " Days";
+			if(days == 1){
+				dys = " Day";
+			}
+			time = days + dys;	
+		}		
+		if((hours > 0) || (hours == 0 && days > 0)){
+			String hrs = " Hours";
+			if(hours == 1){
+				hrs = " Hour";
+			}
 			if(time != null){
-				time = time + "0" + minutes + " Minutes ";
+				time = time + ", " + hours + hrs;
 			}else{
-				time = "0" + minutes + " Minutes ";
+				time = hours + hrs;
 			}		
-		}else if(minutes > 10){
+		}
+		if((minutes > 0) || (minutes == 0 && days > 0) || (minutes == 0 && hours > 0)){
+			String min = " Minutes";
+			if(minutes == 1){
+				min = " Minute";
+			}
 			if(time != null){
-				time = time + minutes + " Minutes ";	
+				time = time + ", " + minutes + min;	
 			}else{
-				time = minutes + " Minutes ";
+				time = minutes + min;
 			}			
 		}
-		if(seconds < 10 && seconds > 0){
+		if(seconds > 0){
+			String sec = " Seconds";
+			if(seconds == 1){
+				sec = " Second";
+			}
 			if(time != null){
-				time = time + "0" + seconds + " Seconds ";
+				time = time + ", " + seconds + sec;
 			}else{
-				time = "0" + seconds + " Seconds ";
-			}		
-		}else if(seconds > 10){
-			if(time != null){
-				time = time + seconds + " Seconds ";
-			}else{
-				time = seconds + " Seconds ";
+				time = seconds + sec;
 			}			
 		}
 		return time;
