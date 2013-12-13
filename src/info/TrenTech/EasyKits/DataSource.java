@@ -252,18 +252,17 @@ public class DataSource extends SQLMethods{
 	}
 	
 	public boolean doMaxUseCheck(Player player, String kitName){
-		boolean b = true;
+		boolean b = true;		
 		File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
 		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
-		int maxUse = plugin.getConfig().getInt("Max-Number-Of-Uses");
-		int playerMaxUse = 0;
 		if(playerConfig.getString(kitName + ".Max-Use") != null){
-			playerMaxUse = playerConfig.getInt(kitName + ".Max-Use");
-			if( playerMaxUse >= maxUse){
+			int playerMaxUse = playerConfig.getInt(kitName + ".Max-Use");
+			int kitMaxUse = getKitMaxUse(kitName);
+			if(playerMaxUse >= kitMaxUse && kitMaxUse != 0){
 				player.sendMessage(ChatColor.DARK_RED + "You have reached the max number of uses for this kit!");
 				b = false;
-			}			
-		}		
+			}
+		}	
 		return b;
 	}
 

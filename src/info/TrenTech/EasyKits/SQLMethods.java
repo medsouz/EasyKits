@@ -65,6 +65,32 @@ public abstract class SQLMethods extends SQLUtils{
 		}	
 	}
 	
+	public boolean maxUseColumnExist() {
+		boolean b = false;
+		try {
+			Statement statement = getConnection().createStatement();
+			DatabaseMetaData md = statement.getConnection().getMetaData();
+			ResultSet rs = md.getColumns(null, null, "kits" , "MaxUse");
+			if (rs.next()){
+				b = true;	
+			}		
+		} catch (SQLException ex) { }
+		return b;
+	}
+	
+	public void createMaxUseColumn(){
+		synchronized (lock) {
+			try {
+				PreparedStatement statement;	
+				statement = prepare("ALTER TABLE kits ADD MaxUse INTEGER");
+				statement.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println("Unable to connect to Database!");
+				System.out.println(e.getMessage());
+			}
+		}	
+	}
+	
 	public boolean tableExist() {
 		boolean b = false;
 		try {
@@ -82,7 +108,7 @@ public abstract class SQLMethods extends SQLUtils{
 		synchronized (lock) {
 			try {
 				PreparedStatement statement;	
-				statement = prepare("CREATE TABLE kits( id INTEGER PRIMARY KEY, Kit TEXT, Inventory BLOB, Armor BLOB, Price DOUBLE, Cooldown TEXT)");
+				statement = prepare("CREATE TABLE kits( id INTEGER PRIMARY KEY, Kit TEXT, Inventory BLOB, Armor BLOB, Price DOUBLE, Cooldown TEXT, MaxUse INTEGER)");
 				statement.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Unable to connect to Database!");
@@ -130,6 +156,20 @@ public abstract class SQLMethods extends SQLUtils{
 			try {
 				PreparedStatement statement = prepare("UPDATE kits SET Cooldown = ? WHERE Kit = ?");
 				statement.setString(1, cooldown);
+				statement.setString(2, kitName);
+				statement.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println("Unable to connect to Database!");
+				System.out.println(e.getMessage());
+			}
+		}
+	}
+	
+	public void setKitMaxUse(String kitName, int maxUse){
+		synchronized (lock) {
+			try {
+				PreparedStatement statement = prepare("UPDATE kits SET MaxUse = ? WHERE Kit = ?");
+				statement.setInt(1, maxUse);
 				statement.setString(2, kitName);
 				statement.executeUpdate();
 			} catch (SQLException e) {
@@ -245,6 +285,24 @@ public abstract class SQLMethods extends SQLUtils{
 			System.out.println(ex.getMessage());
 		}
 		return cooldown;
+	}
+	
+	public int getKitMaxUse(String kitName) {
+		int maxUse = 0;
+		try {
+			PreparedStatement statement = prepare("SELECT * FROM kits");
+			ResultSet rs = statement.executeQuery();
+			while (rs.next()){
+				if (rs.getString("Kit").equalsIgnoreCase(kitName)) {
+					maxUse = rs.getInt("MaxUse");
+					break;
+				}
+			}
+		} catch (SQLException ex) {
+			System.out.println("Unable to connect to Database!");
+			System.out.println(ex.getMessage());
+		}
+		return maxUse;
 	}
 	
 	public String[] getKitList() {

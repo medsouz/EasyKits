@@ -111,15 +111,15 @@ public class EventListener implements Listener {
 							kitItem.setItemMeta(itemMeta);
 							if(index < 54){
 								kitInv.addItem(kitItem);
+								index++;
 							}else{
 								warning = true;
 							}					
-						}
-						index++;
+						}			
 					}						
 					player.openInventory(kitInv);
 					if(warning == true){
-						player.sendMessage(ChatColor.DARK_PURPLE + "There are more kits than can kit in the book. Use /kit list!");
+						player.sendMessage(ChatColor.DARK_PURPLE + "There are more kits than can fit in the book. Use /kit list!");
 					}
 				}
 			}

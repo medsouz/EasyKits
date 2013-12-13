@@ -1,11 +1,16 @@
 package info.TrenTech.EasyKits;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
 import info.TrenTech.EasyKits.EasyKits;
 import info.TrenTech.EasyKits.EasyKits.Items;
 
@@ -24,6 +29,16 @@ public class CommandHandler implements CommandExecutor {
 					if(sender.hasPermission("EasyKits.cmd.reload")){
 						this.plugin.reloadConfig();
 						this.plugin.saveConfig();
+		                File folder = new File(plugin.getDataFolder() + "/players/");
+		                File[] files = folder.listFiles();
+					    for(File file : files){
+					    	YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
+							try {
+								playerConfig.save(file);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+					    }
 						DataSource.instance.dispose();
 						try {
 							DataSource.instance.connect();
@@ -33,8 +48,7 @@ public class CommandHandler implements CommandExecutor {
 						sender.sendMessage(ChatColor.DARK_GREEN + "EasyKits Reloaded!");
 					}else{
 						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
-					}
-					
+					}				
 				}else if(args[0].equalsIgnoreCase("create")){
 					if(sender instanceof Player){
 						Player player = (Player) sender;
@@ -57,8 +71,7 @@ public class CommandHandler implements CommandExecutor {
 						}
 					}else{
 						sender.sendMessage(ChatColor.DARK_RED + "Must be a player!");
-					}
-					
+					}				
 				}else if(args[0].equalsIgnoreCase("cooldown")){
 					if(sender.hasPermission("EasyKits.cmd.create")){
 						if((args.length == 3) && (args[2].matches("(^\\d*)(?i)[s]$") || args[2].matches("(^\\d*)(?i)[m]$") || args[2].matches("(^\\d*)(?i)[h]$") || args[2].matches("(^\\d*)(?i)[d]$"))){
@@ -71,8 +84,24 @@ public class CommandHandler implements CommandExecutor {
 						}else{
 							sender.sendMessage(ChatColor.YELLOW + "/kit cooldown [kitname] [cooldown]");
 						}
+					}else{
+						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
 					}
-					
+				}else if(args[0].equalsIgnoreCase("maxuse")){
+					if(sender.hasPermission("EasyKits.cmd.create")){
+						if((args.length == 3) && isInt(args[2])){
+							if(DataSource.instance.kitExist(args[1])){
+								DataSource.instance.setKitMaxUse(args[1], Integer.parseInt(args[2]));
+								sender.sendMessage(ChatColor.DARK_GREEN + "Kit max-use set to " + args[2]);
+							}else{
+								sender.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
+							}
+						}else{
+							sender.sendMessage(ChatColor.YELLOW + "/kit maxuse [kitname] [max-use]");
+						}
+					}else{
+						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+					}
 				}else if(args[0].equalsIgnoreCase("price")){
 					if(sender.hasPermission("EasyKits.cmd.create")){
 						if((args.length == 3) && isDouble(args[2])){
@@ -85,8 +114,9 @@ public class CommandHandler implements CommandExecutor {
 						}else{
 							sender.sendMessage(ChatColor.YELLOW + "/kit price [kitname] [price]");
 						}
-					}
-					
+					}else{
+						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+					}					
 				}else if(args[0].equalsIgnoreCase("remove")){
 					if(sender.hasPermission("EasyKits.cmd.remove")){
 						if(args.length == 2){
@@ -101,8 +131,7 @@ public class CommandHandler implements CommandExecutor {
 						}
 					}else{
 						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
-					}
-					
+					}					
 				}else if(args[0].equalsIgnoreCase("give")){
 					if(sender.hasPermission("EasyKits.cmd.give")){
 						if(args.length == 3){
@@ -126,8 +155,7 @@ public class CommandHandler implements CommandExecutor {
 						}
 					}else{
 						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
-					}
-					
+					}					
 				}else if(args[0].equalsIgnoreCase("book")){
 					if(sender instanceof Player){
 						Player player = (Player) sender;
@@ -186,9 +214,11 @@ public class CommandHandler implements CommandExecutor {
 				sender.sendMessage(ChatColor.DARK_GREEN + "Command List:");
 				sender.sendMessage(ChatColor.YELLOW + "/kit create [kitname]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit remove [kitname]");
+				sender.sendMessage(ChatColor.YELLOW + "/kit maxuse [kitname] [cooldown]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit cooldown [kitname] [cooldown]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit price [kitname] [price]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit book");
+				sender.sendMessage(ChatColor.YELLOW + "/kit list");
 				sender.sendMessage(ChatColor.YELLOW + "/kit show [kitname]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit [kitname]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit give [player] [kitname]");

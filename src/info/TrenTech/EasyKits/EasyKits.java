@@ -68,10 +68,20 @@ public class EasyKits extends JavaPlugin{
 			log.warning(String.format("[%s] Upgrading database!", new Object[] {getDescription().getName()}));
 		}
 		
+		if(!DataSource.instance.maxUseColumnExist()){
+			DataSource.instance.createMaxUseColumn();
+			log.warning(String.format("[%s] Upgrading database!", new Object[] {getDescription().getName()}));
+		}
+			
     	if(getConfig().getString("Cooldown-Delay") != null){
     		getConfig().set("Cooldown-Delay", null);
     		saveConfig();
     	}
+    	
+		if(getConfig().getString("Max-Number-Of-Uses") != null){
+    		getConfig().set("Max-Number-Of-Uses", null);
+    		saveConfig();
+		}		
     }
     
 	public static enum Items{
