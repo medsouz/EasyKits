@@ -84,108 +84,102 @@ public class DataSource extends SQLMethods{
 	}
 	
 	public boolean kitEquip(Player player, String kitName){
-		String joinKit = plugin.getConfig().getString("First-Join-Kit");
-		if(player.hasPermission("EasyKits.kits." + kitName) || kitName.equalsIgnoreCase(joinKit) || player.hasPermission("EasyKits.kits.*")){
-			ItemStack[] inv = getKitInventory(kitName);
-			ItemStack[] arm = getKitArmor(kitName);
-			ItemStack[] oldInv = player.getInventory().getContents();
-			ItemStack[] oldArm = player.getInventory().getArmorContents();
-			int indexInv = 0;
-			for(ItemStack item : inv){
-				if(player.getInventory().getItem(indexInv) == null){
-					if(item == null){
-						item = new ItemStack(Material.AIR);
-					}
-					player.getInventory().setItem(indexInv, item);
-				}else if(player.getInventory().firstEmpty() > -1){
-					if(item == null){
-						item = new ItemStack(Material.AIR);
-					}
-					player.getInventory().addItem(item);				
-				}else{
-					int amount = item.getAmount();
-					HashMap<Integer, ? extends ItemStack> matchItem = player.getInventory().all(item);
-					int size = matchItem.size();
-					if(size < item.getMaxStackSize()){
-						size = item.getMaxStackSize() - size;
-						if(amount <= size){
-							player.getInventory().setItem(indexInv, item);
-						}else{
-							revertChanges(player, oldInv, oldArm );
-							return false;					
-						}
+		ItemStack[] inv = getKitInventory(kitName);
+		ItemStack[] arm = getKitArmor(kitName);
+		ItemStack[] oldInv = player.getInventory().getContents();
+		ItemStack[] oldArm = player.getInventory().getArmorContents();
+		int indexInv = 0;
+		for(ItemStack item : inv){
+			if(player.getInventory().getItem(indexInv) == null){
+				if(item == null){
+					item = new ItemStack(Material.AIR);
+				}
+				player.getInventory().setItem(indexInv, item);
+			}else if(player.getInventory().firstEmpty() > -1){
+				if(item == null){
+					item = new ItemStack(Material.AIR);
+				}
+				player.getInventory().addItem(item);				
+			}else{
+				int amount = item.getAmount();
+				HashMap<Integer, ? extends ItemStack> matchItem = player.getInventory().all(item);
+				int size = matchItem.size();
+				if(size < item.getMaxStackSize()){
+					size = item.getMaxStackSize() - size;
+					if(amount <= size){
+						player.getInventory().setItem(indexInv, item);
 					}else{
-						for(int i = 10; i <= 36; i++){
-							if(i == 36){
-								revertChanges(player, oldInv, oldArm );
-								return false;
+						revertChanges(player, oldInv, oldArm );
+						return false;					
+					}
+				}else{
+					for(int i = 10; i <= 36; i++){
+						if(i == 36){
+							revertChanges(player, oldInv, oldArm );
+							return false;
+						}
+						size = size - item.getMaxStackSize();
+						if(size < item.getMaxStackSize()){
+							if(amount <= size){
+								player.getInventory().setItem(indexInv, item);
 							}
-							size = size - item.getMaxStackSize();
-							if(size < item.getMaxStackSize()){
-								if(amount <= size){
-									player.getInventory().setItem(indexInv, item);
-								}
-							}
 						}
 					}
 				}
-				indexInv++;
 			}
-			int index = 0;
-			for(ItemStack item : arm){
-				if(index == 0){
-					if(item != null){
-						if(player.getInventory().getBoots() == null){
-							player.getInventory().setBoots(item);
-						}else if(player.getInventory().firstEmpty() > -1){
-							player.getInventory().addItem(item);
-						}else{
-							revertChanges(player, oldInv, oldArm );
-							return false;
-						}
+			indexInv++;
+		}
+		int index = 0;
+		for(ItemStack item : arm){
+			if(index == 0){
+				if(item != null){
+					if(player.getInventory().getBoots() == null){
+						player.getInventory().setBoots(item);
+					}else if(player.getInventory().firstEmpty() > -1){
+						player.getInventory().addItem(item);
+					}else{
+						revertChanges(player, oldInv, oldArm );
+						return false;
 					}
 				}
-				if(index == 1){
-					if(item != null){
-						if(player.getInventory().getLeggings() == null){
-							player.getInventory().setLeggings(item);
-						}else if(player.getInventory().firstEmpty() > -1){
-							player.getInventory().addItem(item);
-						}else{
-							revertChanges(player, oldInv, oldArm );
-							return false;
-						}
-					}
-				}
-				if(index == 2){
-					if(item != null){
-						if(player.getInventory().getChestplate() == null){
-							player.getInventory().setChestplate(item);
-						}else if(player.getInventory().firstEmpty() > -1){
-							player.getInventory().addItem(item);
-						}else{
-							revertChanges(player, oldInv, oldArm );
-							return false;
-						}
-					}
-				}
-				if(index == 3){
-					if(item != null){
-						if(player.getInventory().getHelmet() == null){
-							player.getInventory().setHelmet(item);
-						}else if(player.getInventory().firstEmpty() > -1){
-							player.getInventory().addItem(item);
-						}else{
-							revertChanges(player, oldInv, oldArm );
-							return false;
-						}
-					}
-				}
-				index++;			
 			}
-		}else{
-			player.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
-			return false;
+			if(index == 1){
+				if(item != null){
+					if(player.getInventory().getLeggings() == null){
+						player.getInventory().setLeggings(item);
+					}else if(player.getInventory().firstEmpty() > -1){
+						player.getInventory().addItem(item);
+					}else{
+						revertChanges(player, oldInv, oldArm );
+						return false;
+					}
+				}
+			}
+			if(index == 2){
+				if(item != null){
+					if(player.getInventory().getChestplate() == null){
+						player.getInventory().setChestplate(item);
+					}else if(player.getInventory().firstEmpty() > -1){
+						player.getInventory().addItem(item);
+					}else{
+						revertChanges(player, oldInv, oldArm );
+						return false;
+					}
+				}
+			}
+			if(index == 3){
+				if(item != null){
+					if(player.getInventory().getHelmet() == null){
+						player.getInventory().setHelmet(item);
+					}else if(player.getInventory().firstEmpty() > -1){
+						player.getInventory().addItem(item);
+					}else{
+						revertChanges(player, oldInv, oldArm );
+						return false;
+					}
+				}
+			}
+			index++;			
 		}
 		return true;
 	}
@@ -214,6 +208,10 @@ public class DataSource extends SQLMethods{
 		boolean maxUse = true;
 		boolean charge = true;		
 		boolean pass = true;
+		if(!player.hasPermission("EasyKits.kits." + kitName)){
+			player.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+			pass = false;
+		}
 		if(player.hasPermission("EasyKits.kits.maxuse") && !player.isOp()){
 			if(!doMaxUseCheck(player, kitName)){
 				pass = false;
@@ -353,8 +351,7 @@ public class DataSource extends SQLMethods{
 			if(DataSource.instance.kitExist(kitName)){
 				ItemStack[] inv = DataSource.instance.getKitInventory(kitName);
 				ItemStack[] arm = DataSource.instance.getKitArmor(kitName);
-				String joinKit = plugin.getConfig().getString("First-Join-Kit");
-				if(player.hasPermission("EasyKits.kits." + kitName) || kitName.equalsIgnoreCase(joinKit) || player.hasPermission("EasyKits.kits.*")){
+				if(player.hasPermission("EasyKits.kits." + kitName) && !kitName.equalsIgnoreCase(plugin.getConfig().getString("First-Join-Kit"))){
 					Inventory showInv = plugin.getServer().createInventory(player, 45, "EasyKits Kit: " + kitName);
 					showInv.setContents(inv);								
 					int index = 36;

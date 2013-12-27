@@ -94,9 +94,8 @@ public class EventListener implements Listener {
 					}
 					int index = 0;
 					boolean warning = false;
-					String joinKit = this.plugin.getConfig().getString("First-Join-Kit");
 					for(String kit : list){
-						if(player.hasPermission("EasyKits.kits." + kit) || kit.equalsIgnoreCase(joinKit) || player.hasPermission("EasyKits.kits.*")){
+						if(player.hasPermission("EasyKits.kits." + kit) && !kit.equalsIgnoreCase(plugin.getConfig().getString("First-Join-Kit"))){
 							ItemStack kitItem = new ItemStack(Material.BOOK);
 							ItemMeta itemMeta = kitItem.getItemMeta();
 							itemMeta.setDisplayName("EasyKits Kit: " + kit);

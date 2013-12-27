@@ -171,9 +171,8 @@ public class CommandHandler implements CommandExecutor {
 					if(sender.hasPermission("EasyKits.cmd.list")){
 						String[] list = DataSource.instance.getKitList();
 						sender.sendMessage(ChatColor.UNDERLINE +""+ ChatColor.DARK_GREEN + "Kits:");
-						String joinKit = this.plugin.getConfig().getString("First-Join-Kit");
 						for(String kit : list){
-							if(sender.hasPermission("EasyKits.kits." + kit) || kit.equalsIgnoreCase(joinKit) || sender.hasPermission("EasyKits.kits.*")){
+							if(sender.hasPermission("EasyKits.kits." + kit) && !kit.equalsIgnoreCase(plugin.getConfig().getString("First-Join-Kit"))){
 								double price = DataSource.instance.getKitPrice(kit);
 								if(price > 0){
 									sender.sendMessage(ChatColor.YELLOW + "- " + kit + ": " + ChatColor.DARK_GREEN + "$" + price);	
