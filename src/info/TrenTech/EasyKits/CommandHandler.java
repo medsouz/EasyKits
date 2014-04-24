@@ -25,7 +25,14 @@ public class CommandHandler implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (label.equalsIgnoreCase("kit")) {
 			if(args.length >= 1){
-				if(args[0].equalsIgnoreCase("reload")){
+				if(args[0].equalsIgnoreCase("update")){
+					if(sender.hasPermission("EasyKits.cmd.update")){
+						sender.sendMessage(ChatColor.GRAY + "Plugin will update. Check server log for details!");
+						new Updater(plugin, 67835, plugin.file, Updater.UpdateType.NO_VERSION_CHECK, true);
+					}else{
+						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+					}
+				}else if(args[0].equalsIgnoreCase("reload")){
 					if(sender.hasPermission("EasyKits.cmd.reload")){
 						this.plugin.reloadConfig();
 						this.plugin.saveConfig();

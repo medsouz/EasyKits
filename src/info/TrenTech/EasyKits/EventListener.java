@@ -63,7 +63,7 @@ public class EventListener implements Listener {
 		Player player = event.getPlayer();
 		File file = new File(this.plugin.getDataFolder() + "/players/", player.getName() + ".yml");
 		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
-		DataSource.instance.saveConfig(file, playerConfig);
+		Utils.saveConfig(file, playerConfig);
 		String joinKit = this.plugin.getConfig().getString("First-Join-Kit");
 		if(!player.hasPlayedBefore()) {		
 			 if(DataSource.instance.kitExist(joinKit)){
@@ -71,6 +71,11 @@ public class EventListener implements Listener {
 				 DataSource.instance.kitEquip(player, joinKit);
 			 }
 		}
+		if(player.hasPermission("EasyKits.cmd.update") && EasyKits.update){
+		    player.sendMessage(ChatColor.YELLOW + "Update Available: " + EasyKits.name + " for " + EasyKits.version);
+		    player.sendMessage(ChatColor.YELLOW + "Type /kit update if you would like to update!");
+		}
+				
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
