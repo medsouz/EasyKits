@@ -24,7 +24,7 @@ public class CommandHandler implements CommandExecutor {
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if (label.equalsIgnoreCase("kit")) {
+		if (label.equalsIgnoreCase("kit") || label.equalsIgnoreCase("k") || label.equalsIgnoreCase("easykits")) {
 			if(args.length >= 1){
 				if(args[0].equalsIgnoreCase("reload")){
 					if(sender.hasPermission("EasyKits.cmd.reload")){
@@ -212,6 +212,7 @@ public class CommandHandler implements CommandExecutor {
 				
 			}else{
 				sender.sendMessage(ChatColor.DARK_GREEN + "Command List:");
+				sender.sendMessage(ChatColor.YELLOW + "/kit -or- /easykits -or- /k");
 				sender.sendMessage(ChatColor.YELLOW + "/kit create [kitname]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit remove [kitname]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit maxuse [kitname] [cooldown]");
