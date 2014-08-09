@@ -24,29 +24,16 @@ public class EasyKits extends JavaPlugin{
 	public boolean econSupport = true;
 	private EventListener eventlistener;
 	private CommandHandler cmdExecutor;
-	private Updater updater;
 	public File file = this.getFile();
 	public static boolean update = false;
 	public static String name = "";
 	public static String type = "";
 	public static String version = "";
 	public static String link = "";
+	
     @Override
     public void onEnable(){
-    	if(getConfig().getBoolean("Plugin-Auto-Update")){
-    		updater = new Updater(this, 67835, this.getFile(), Updater.UpdateType.DEFAULT, true);
-    	}else{
-    		updater = new Updater(this, 67835, this.getFile(), Updater.UpdateType.NO_DOWNLOAD, false);
-    	    update = updater.getResult() == Updater.UpdateResult.UPDATE_AVAILABLE; // Determine if there is an update ready for us
-    	    name = updater.getLatestName(); // Get the latest name
-    	    version = updater.getLatestGameVersion(); // Get the latest game version
-    	    type = updater.getLatestType(); // Get the latest file's type
-    	    link = updater.getLatestFileLink(); // Get the latest link
-    		if(update){   			
-    			log.info(String.format("[%s] Update Available: " + EasyKits.name + " for " + EasyKits.version, new Object[] {getDescription().getName()})); 
-    			log.info(String.format("[%s] Run /kit update to update EasyKits", new Object[] {getDescription().getName()}));
-    		}
-    	}
+
     	new DataSource(this);
 
 		this.eventlistener = new EventListener(this);

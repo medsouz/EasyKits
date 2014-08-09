@@ -44,15 +44,15 @@ public class DataSource extends SQLMethods{
 	    } catch (IOException ioexception) {
 	        ioexception.printStackTrace();
 	    }
-	    if(getKitInv(kitName) == null){
-	    	createKit(kitName, inv.toByteArray(), armor.toByteArray());
+	    if(getKitInv(kitName.toLowerCase()) == null){
+	    	createKit(kitName.toLowerCase(), inv.toByteArray(), armor.toByteArray());
 	    }else{
-		    saveKitSQL(kitName, inv.toByteArray(), armor.toByteArray());	
+		    saveKitSQL(kitName.toLowerCase(), inv.toByteArray(), armor.toByteArray());	
 	    }
 	}
 	
 	public ItemStack[] getKitInventory(String kitName){
-        byte[] byteInv =  getKitInv(kitName);
+        byte[] byteInv =  getKitInv(kitName.toLowerCase());
 		ByteArrayInputStream ByteArIS = new ByteArrayInputStream(byteInv);
         Object inv = null;
         try {
@@ -68,7 +68,7 @@ public class DataSource extends SQLMethods{
 	}
 	
 	public ItemStack[] getKitArmor(String kitName){
-        byte[] byteArm =  getKitArm(kitName);
+        byte[] byteArm =  getKitArm(kitName.toLowerCase());
 		ByteArrayInputStream ByteArIS = new ByteArrayInputStream(byteArm);
         Object armor = null;
         try {
@@ -84,8 +84,8 @@ public class DataSource extends SQLMethods{
 	}
 	
 	public boolean kitEquip(Player player, String kitName){
-		ItemStack[] inv = getKitInventory(kitName);
-		ItemStack[] arm = getKitArmor(kitName);
+		ItemStack[] inv = getKitInventory(kitName.toLowerCase());
+		ItemStack[] arm = getKitArmor(kitName.toLowerCase());
 		ItemStack[] oldInv = player.getInventory().getContents();
 		ItemStack[] oldArm = player.getInventory().getArmorContents();
 		int indexInv = 0;
@@ -193,44 +193,31 @@ public class DataSource extends SQLMethods{
 		player.sendMessage(ChatColor.DARK_RED + "Insufficient inventory space!");
 	}
 	
-//	public void saveConfig(File file, YamlConfiguration config) {
-//		try {
-//			if(!file.getParentFile().exists()) {
-//				file.getParentFile().mkdirs();
-//			}
-//			file.createNewFile();
-//			config.save(file);
-//		} catch (IOException e) {
-//			System.err.println("Error writing config");
-//			e.printStackTrace();
-//		}
-//	}
-	
 	public void doKitEquipCheck(final Player player, final String kitName){
 		boolean cooldown = true;
 		boolean maxUse = true;
 		boolean charge = true;		
 		boolean pass = true;
-		if(!player.hasPermission("EasyKits.kits." + kitName)){
+		if(!player.hasPermission("EasyKits.kits." + kitName.toLowerCase())){
 			player.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
 			pass = false;
 		}
 		if(player.hasPermission("EasyKits.kits.maxuse") && !player.isOp()){
-			if(!doMaxUseCheck(player, kitName)){
+			if(!doMaxUseCheck(player, kitName.toLowerCase())){
 				pass = false;
 			}
 		}else{
 			maxUse = false;
 		}
 		if(player.hasPermission("EasyKits.kits.cooldown") && !player.isOp()){
-			if(!doCooldownCheck(player, kitName)){
+			if(!doCooldownCheck(player, kitName.toLowerCase())){
 				pass = false;
 			}
 		}else{
 			cooldown = false;
 		}
 		if(plugin.econSupport && !player.hasPermission("EasyKits.kits.bypassprice")){
-			if(!doPriceCheck(player, kitName)){
+			if(!doPriceCheck(player, kitName.toLowerCase())){
 				pass = false;
 			}
 		}else{
@@ -239,13 +226,13 @@ public class DataSource extends SQLMethods{
 		if(pass){
 			if(DataSource.instance.kitEquip(player, kitName)){
 				if(maxUse){
-					setMaxUse(player, kitName);
+					setMaxUse(player, kitName.toLowerCase());
 				}
 				if(cooldown){
-					setCooldown(player.getName(), kitName);
+					setCooldown(player.getName(), kitName.toLowerCase());
 				}
 				if(charge){
-					doKitCharge(player, kitName);
+					doKitCharge(player, kitName.toLowerCase());
 				}
 				player.sendMessage(ChatColor.DARK_GREEN + "Kit equipped!");
 			}
@@ -256,9 +243,9 @@ public class DataSource extends SQLMethods{
 		boolean b = true;		
 		File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
 		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
-		if(playerConfig.getString(kitName + ".Max-Use") != null){
-			int playerMaxUse = playerConfig.getInt(kitName + ".Max-Use");
-			int kitMaxUse = getKitMaxUse(kitName);
+		if(playerConfig.getString(kitName.toLowerCase() + ".Max-Use") != null){
+			int playerMaxUse = playerConfig.getInt(kitName.toLowerCase() + ".Max-Use");
+			int kitMaxUse = getKitMaxUse(kitName.toLowerCase());
 			if(playerMaxUse >= kitMaxUse && kitMaxUse != 0){
 				player.sendMessage(ChatColor.DARK_RED + "You have reached the max number of uses for this kit!");
 				b = false;
@@ -271,10 +258,10 @@ public class DataSource extends SQLMethods{
 		File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
 		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
 		int playerMaxUse = 0;
-		if(playerConfig.getString(kitName + ".Max-Use") != null){
+		if(playerConfig.getString(kitName.toLowerCase() + ".Max-Use") != null){
 			playerMaxUse = playerConfig.getInt(kitName + ".Max-Use");
 		}
-		playerConfig.set(kitName + ".Max-Use", playerMaxUse + 1);
+		playerConfig.set(kitName.toLowerCase() + ".Max-Use", playerMaxUse + 1);
 		try {
 			playerConfig.save(file);
 		} catch (IOException e) {
@@ -286,9 +273,9 @@ public class DataSource extends SQLMethods{
 		boolean b = true;
 		File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
 		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
-		if(playerConfig.getString(kitName + ".Cooldown") != null){
-			String playerKitCooldown = playerConfig.getString(kitName + ".Cooldown");
-			String kitCooldown = getKitCooldown(kitName);
+		if(playerConfig.getString(kitName.toLowerCase() + ".Cooldown") != null){
+			String playerKitCooldown = playerConfig.getString(kitName.toLowerCase() + ".Cooldown");
+			String kitCooldown = getKitCooldown(kitName.toLowerCase());
 			Date date = new Date();
 			Date cooldownDate = null;
 			try {
@@ -322,7 +309,7 @@ public class DataSource extends SQLMethods{
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 		String strDate = dateFormat.format(date).toString();
-		playerConfig.set(kitName + ".Cooldown", strDate);
+		playerConfig.set(kitName.toLowerCase() + ".Cooldown", strDate);
 		try {
 			playerConfig.save(file);
 		} catch (IOException e) {
@@ -332,7 +319,8 @@ public class DataSource extends SQLMethods{
 	
 	public boolean doPriceCheck(Player player, String kitName){
 		boolean b = true;
-		double price = getKitPrice(kitName);
+		double price = getKitPrice(kitName.toLowerCase());
+		@SuppressWarnings("deprecation")
 		double balance = plugin.economy.getBalance(player.getName());
 		if(balance < price){
 			b = false;
@@ -341,8 +329,9 @@ public class DataSource extends SQLMethods{
 		return b;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public void doKitCharge(Player player, String kitName){
-		double price = getKitPrice(kitName);
+		double price = getKitPrice(kitName.toLowerCase());
 		if(price != 0){
 			plugin.economy.withdrawPlayer(player.getName(), price);
 			player.sendMessage(ChatColor.DARK_GREEN + "Charged $" + price);
@@ -352,10 +341,10 @@ public class DataSource extends SQLMethods{
 	public void showKit(Player player, String kitName){
 		if(player.hasPermission("EasyKits.cmd.show")){
 			if(DataSource.instance.kitExist(kitName)){
-				ItemStack[] inv = DataSource.instance.getKitInventory(kitName);
-				ItemStack[] arm = DataSource.instance.getKitArmor(kitName);
-				if(player.hasPermission("EasyKits.kits." + kitName) && !kitName.equalsIgnoreCase(plugin.getConfig().getString("First-Join-Kit"))){
-					Inventory showInv = plugin.getServer().createInventory(player, 45, "EasyKits Kit: " + kitName);
+				ItemStack[] inv = DataSource.instance.getKitInventory(kitName.toLowerCase());
+				ItemStack[] arm = DataSource.instance.getKitArmor(kitName.toLowerCase());
+				if(player.hasPermission("EasyKits.kits." + kitName.toLowerCase()) && !kitName.toLowerCase().equalsIgnoreCase(plugin.getConfig().getString("First-Join-Kit"))){
+					Inventory showInv = plugin.getServer().createInventory(player, 45, "EasyKits Kit: " + kitName.toLowerCase());
 					showInv.setContents(inv);								
 					int index = 36;
 					for(ItemStack a : arm){
@@ -364,7 +353,7 @@ public class DataSource extends SQLMethods{
 					}	
 					ItemStack getKit = new ItemStack(Material.NETHER_STAR);
 					ItemMeta getKitMeta = getKit.getItemMeta();
-					getKitMeta.setDisplayName(ChatColor.GREEN + "Get " + kitName);
+					getKitMeta.setDisplayName(ChatColor.GREEN + "Get " + kitName.toLowerCase());
 					ArrayList<String> getKitLores = new ArrayList<String>();
 					getKitLores.add(ChatColor.DARK_PURPLE+ "Click to equip kit!");
 					getKitMeta.setLore(getKitLores);
@@ -379,55 +368,5 @@ public class DataSource extends SQLMethods{
 			player.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
 		}
 	}
-	
-//	static String formatTime(int timeInSec) {
-//		int days = timeInSec / 86400;
-//		int dRemainder = timeInSec % 86400;
-//		int hours = dRemainder / 3600;
-//		int hRemainder = dRemainder % 3600;
-//		int minutes = hRemainder / 60;
-//		int seconds = hRemainder % 60;
-//		String time = null;
-//		if(days > 0){
-//			String dys = " Days";
-//			if(days == 1){
-//				dys = " Day";
-//			}
-//			time = days + dys;	
-//		}		
-//		if((hours > 0) || (hours == 0 && days > 0)){
-//			String hrs = " Hours";
-//			if(hours == 1){
-//				hrs = " Hour";
-//			}
-//			if(time != null){
-//				time = time + ", " + hours + hrs;
-//			}else{
-//				time = hours + hrs;
-//			}		
-//		}
-//		if((minutes > 0) || (minutes == 0 && days > 0) || (minutes == 0 && hours > 0)){
-//			String min = " Minutes";
-//			if(minutes == 1){
-//				min = " Minute";
-//			}
-//			if(time != null){
-//				time = time + ", " + minutes + min;	
-//			}else{
-//				time = minutes + min;
-//			}			
-//		}
-//		if(seconds > 0){
-//			String sec = " Seconds";
-//			if(seconds == 1){
-//				sec = " Second";
-//			}
-//			if(time != null){
-//				time = time + ", " + seconds + sec;
-//			}else{
-//				time = seconds + sec;
-//			}			
-//		}
-//		return time;
-//	}
+
 }

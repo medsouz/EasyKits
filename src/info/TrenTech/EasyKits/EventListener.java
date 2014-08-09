@@ -30,7 +30,7 @@ public class EventListener implements Listener {
 		if(event.getInventory().getTitle().contains("EasyKits Kit:")){
 			event.setCancelled(true);
 			Player player = (Player) event.getWhoClicked();
-			String kitName = event.getInventory().getTitle().replace("EasyKits Kit: ", "");
+			String kitName = event.getInventory().getTitle().replace("EasyKits Kit: ", "").toLowerCase();
 			if(event.getSlot() == 44){
 				DataSource.instance.doKitEquipCheck(player, kitName);
 				player.closeInventory();
@@ -42,7 +42,7 @@ public class EventListener implements Listener {
 				if(event.getCurrentItem().getType() == Material.BOOK && event.getCurrentItem().hasItemMeta()){
 					if(event.getCurrentItem().getItemMeta().hasDisplayName()){
 						if(event.getCurrentItem().getItemMeta().getDisplayName().contains("EasyKits Kit:")){
-							String kitName = event.getCurrentItem().getItemMeta().getDisplayName().replace("EasyKits Kit: ", "");
+							String kitName = event.getCurrentItem().getItemMeta().getDisplayName().replace("EasyKits Kit: ", "").toLowerCase();
 							event.setCancelled(true);
 							String[] list = DataSource.instance.getKitList();
 							for(String kit : list){

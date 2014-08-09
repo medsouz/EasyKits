@@ -1,9 +1,10 @@
 name: EasyKits
 main: info.TrenTech.EasyKits.EasyKits
-version: 1.4.5
+version: 1.4.6
 commands:
   kit:
     usage: /<command>
+    aliases: [easykits,k]
 permissions:
   EasyKits.*:
     default: op

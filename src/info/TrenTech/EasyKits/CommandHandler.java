@@ -21,18 +21,12 @@ public class CommandHandler implements CommandExecutor {
 		this.plugin = plugin;
 	}
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (label.equalsIgnoreCase("kit")) {
 			if(args.length >= 1){
-				if(args[0].equalsIgnoreCase("update")){
-					if(sender.hasPermission("EasyKits.cmd.update")){
-						sender.sendMessage(ChatColor.GRAY + "Plugin will update. Check server log for details!");
-						new Updater(plugin, 67835, plugin.file, Updater.UpdateType.NO_VERSION_CHECK, true);
-					}else{
-						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
-					}
-				}else if(args[0].equalsIgnoreCase("reload")){
+				if(args[0].equalsIgnoreCase("reload")){
 					if(sender.hasPermission("EasyKits.cmd.reload")){
 						this.plugin.reloadConfig();
 						this.plugin.saveConfig();
@@ -64,7 +58,7 @@ public class CommandHandler implements CommandExecutor {
 								if(!DataSource.instance.kitExist(args[1])){
 									ItemStack[] inv = player.getInventory().getContents();
 									ItemStack[] arm = player.getInventory().getArmorContents();
-									DataSource.instance.saveKit(args[1], inv, arm);
+									DataSource.instance.saveKit(args[1].toLowerCase(), inv, arm);
 									player.sendMessage(ChatColor.DARK_GREEN + "Kit saved!");
 								}else{
 									player.sendMessage(ChatColor.DARK_RED + args[1] + " already exists!");
@@ -82,8 +76,8 @@ public class CommandHandler implements CommandExecutor {
 				}else if(args[0].equalsIgnoreCase("cooldown")){
 					if(sender.hasPermission("EasyKits.cmd.create")){
 						if((args.length == 3) && (args[2].matches("(^\\d*)(?i)[s]$") || args[2].matches("(^\\d*)(?i)[m]$") || args[2].matches("(^\\d*)(?i)[h]$") || args[2].matches("(^\\d*)(?i)[d]$"))){
-							if(DataSource.instance.kitExist(args[1])){
-								DataSource.instance.setKitCooldown(args[1], args[2]);
+							if(DataSource.instance.kitExist(args[1].toLowerCase())){
+								DataSource.instance.setKitCooldown(args[1].toLowerCase(), args[2]);
 								sender.sendMessage(ChatColor.DARK_GREEN + "Kit cooldown set to " + args[2]);
 							}else{
 								sender.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
@@ -97,8 +91,8 @@ public class CommandHandler implements CommandExecutor {
 				}else if(args[0].equalsIgnoreCase("maxuse")){
 					if(sender.hasPermission("EasyKits.cmd.create")){
 						if((args.length == 3) && isInt(args[2])){
-							if(DataSource.instance.kitExist(args[1])){
-								DataSource.instance.setKitMaxUse(args[1], Integer.parseInt(args[2]));
+							if(DataSource.instance.kitExist(args[1].toLowerCase())){
+								DataSource.instance.setKitMaxUse(args[1].toLowerCase(), Integer.parseInt(args[2]));
 								sender.sendMessage(ChatColor.DARK_GREEN + "Kit max-use set to " + args[2]);
 							}else{
 								sender.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
@@ -112,8 +106,8 @@ public class CommandHandler implements CommandExecutor {
 				}else if(args[0].equalsIgnoreCase("price")){
 					if(sender.hasPermission("EasyKits.cmd.create")){
 						if((args.length == 3) && isDouble(args[2])){
-							if(DataSource.instance.kitExist(args[1])){
-								DataSource.instance.setKitPrice(args[1], Double.parseDouble(args[2]));
+							if(DataSource.instance.kitExist(args[1].toLowerCase())){
+								DataSource.instance.setKitPrice(args[1].toLowerCase(), Double.parseDouble(args[2]));
 								sender.sendMessage(ChatColor.DARK_GREEN + "Kit price set to $" + args[2]);
 							}else{
 								sender.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
@@ -127,8 +121,8 @@ public class CommandHandler implements CommandExecutor {
 				}else if(args[0].equalsIgnoreCase("remove")){
 					if(sender.hasPermission("EasyKits.cmd.remove")){
 						if(args.length == 2){
-							if(DataSource.instance.kitExist(args[1])){
-								DataSource.instance.deleteKit(args[1]);
+							if(DataSource.instance.kitExist(args[1].toLowerCase())){
+								DataSource.instance.deleteKit(args[1].toLowerCase());
 								sender.sendMessage(ChatColor.DARK_GREEN + "Kit removed!");
 							}else{
 								sender.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
@@ -142,11 +136,11 @@ public class CommandHandler implements CommandExecutor {
 				}else if(args[0].equalsIgnoreCase("give")){
 					if(sender.hasPermission("EasyKits.cmd.give")){
 						if(args.length == 3){
-							if(this.plugin.getServer().getPlayer(args[1]).isOnline()){
-								Player player = this.plugin.getServer().getPlayer(args[1]);
+							if(this.plugin.getServer().getPlayer(args[1].toLowerCase()).isOnline()){
+								Player player = this.plugin.getServer().getPlayer(args[1].toLowerCase());
 								if(DataSource.instance.kitExist(args[2])){
 									if(DataSource.instance.kitEquip(player, args[2])){
-										sender.sendMessage(ChatColor.DARK_GREEN + "gave kit to " + args[1]);
+										sender.sendMessage(ChatColor.DARK_GREEN + "gave kit to " + args[1].toLowerCase());
 										player.sendMessage(ChatColor.DARK_GREEN + sender.getName() + " gave you a kit!");
 									}else{
 										sender.sendMessage(ChatColor.DARK_RED + "Player has insufficient inventory space!");
@@ -195,7 +189,7 @@ public class CommandHandler implements CommandExecutor {
 					if(sender instanceof Player){
 						Player player = (Player)sender;
 						if(args.length == 2){
-							DataSource.instance.showKit(player, args[1]);
+							DataSource.instance.showKit(player, args[1].toLowerCase());
 						}else{
 							sender.sendMessage(ChatColor.YELLOW + "/kit show [kitname]");
 						}
@@ -206,8 +200,8 @@ public class CommandHandler implements CommandExecutor {
 				}else if(args.length == 1){				
 					if(sender instanceof Player){
 						Player player = (Player)sender;
-						if(DataSource.instance.kitExist(args[0])){				
-							DataSource.instance.doKitEquipCheck(player, args[0]);
+						if(DataSource.instance.kitExist(args[0].toLowerCase())){				
+							DataSource.instance.doKitEquipCheck(player, args[0].toLowerCase());
 						}else{
 							player.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
 						}
