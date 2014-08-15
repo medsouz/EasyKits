@@ -1,18 +1,20 @@
 package info.TrenTech.EasyKits;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
 import info.TrenTech.EasyKits.EventListener;
 import info.TrenTech.EasyKits.CommandHandler;
 
@@ -22,22 +24,14 @@ public class EasyKits extends JavaPlugin{
 	public final Logger log = Logger.getLogger("Minecraft");
 	public Economy economy;
 	public boolean econSupport = true;
-	private EventListener eventlistener;
 	private CommandHandler cmdExecutor;
-	public File file = this.getFile();
-	public static boolean update = false;
-	public static String name = "";
-	public static String type = "";
-	public static String version = "";
-	public static String link = "";
 	
     @Override
     public void onEnable(){
 
     	new DataSource(this);
-
-		this.eventlistener = new EventListener(this);
-		getServer().getPluginManager().registerEvents(this.eventlistener, this);
+    	
+    	registerEvents(this, new EventListener(this), new SignListener(this));
     	
     	getConfig().options().copyDefaults(true);
     	saveConfig();
@@ -112,6 +106,12 @@ public class EasyKits extends JavaPlugin{
 			itemStack.setItemMeta(itemMeta);
 		}
 		return itemStack;
+	}
+	
+	public static void registerEvents(org.bukkit.plugin.Plugin plugin, Listener... listeners) {
+		for (Listener listener : listeners) {
+			Bukkit.getServer().getPluginManager().registerEvents(listener, plugin);
+		}
 	}
 	
 	private boolean setupEconomy() {

@@ -70,12 +70,7 @@ public class EventListener implements Listener {
 				 player.sendMessage(ChatColor.DARK_GREEN + "Have a kit to get you started!");
 				 DataSource.instance.kitEquip(player, joinKit);
 			 }
-		}
-		if(player.hasPermission("EasyKits.cmd.update") && EasyKits.update){
-		    player.sendMessage(ChatColor.YELLOW + "Update Available: " + EasyKits.name + " for " + EasyKits.version);
-		    player.sendMessage(ChatColor.YELLOW + "Type /kit update if you would like to update!");
-		}
-				
+		}		
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
