@@ -20,7 +20,7 @@ permissions:
       EasyKits.cmd.give: true
       EasyKits.cmd.list: true
       EasyKits.cmd.show: true
-      EasyKits.cmd.update: true
+      EasyKits.cmd.reset: true
   EasyKits.cmd.reload:
     default: op
   EasyKits.cmd.create:
@@ -33,7 +33,7 @@ permissions:
     default: op
   EasyKits.cmd.show:
     default: op
-  EasyKits.cmd.update:
+  EasyKits.cmd.reset:
     default: op
   EasyKits.kits.*:
     default: op
