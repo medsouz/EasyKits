@@ -243,6 +243,7 @@ public class CommandHandler implements CommandExecutor {
 				sender.sendMessage(ChatColor.YELLOW + "/kit remove [kitname]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit maxuse [kitname] [cooldown]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit cooldown [kitname] [cooldown]");
+				sender.sendMessage(ChatColor.YELLOW + "/kit reset [cooldown/maxuse] [kit] [player]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit price [kitname] [price]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit book");
 				sender.sendMessage(ChatColor.YELLOW + "/kit list");
