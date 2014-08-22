@@ -61,8 +61,12 @@ public class EventListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLoginEvent(PlayerJoinEvent event){
 		Player player = event.getPlayer();
-		File file = new File(this.plugin.getDataFolder() + "/players/", player.getName() + ".yml");
+		if(!EasyKits.players.containsKey(player.getUniqueId())){
+			EasyKits.players.put(player.getUniqueId(), player.getName());
+		}
+		File file = new File(this.plugin.getDataFolder() + "/players/", player.getUniqueId() + ".yml");
 		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
+		playerConfig.set("Player", player.getName());
 		Utils.saveConfig(file, playerConfig);
 		String joinKit = this.plugin.getConfig().getString("First-Join-Kit");
 		if(!player.hasPlayedBefore()) {		

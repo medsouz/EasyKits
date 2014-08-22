@@ -2,6 +2,7 @@ package info.TrenTech.EasyKits;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -21,7 +22,6 @@ public class CommandHandler implements CommandExecutor {
 		this.plugin = plugin;
 	}
 	
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (label.equalsIgnoreCase("kit") || label.equalsIgnoreCase("k") || label.equalsIgnoreCase("easykits")) {
@@ -136,8 +136,9 @@ public class CommandHandler implements CommandExecutor {
 				}else if(args[0].equalsIgnoreCase("give")){
 					if(sender.hasPermission("EasyKits.cmd.give")){
 						if(args.length == 3){
-							if(this.plugin.getServer().getPlayer(args[1].toLowerCase()).isOnline()){
-								Player player = this.plugin.getServer().getPlayer(args[1].toLowerCase());
+							UUID uuid = Utils.getUUID(args[1]);
+							if(this.plugin.getServer().getPlayer(uuid).isOnline()){
+								Player player = this.plugin.getServer().getPlayer(uuid);
 								if(DataSource.instance.kitExist(args[2])){
 									if(DataSource.instance.kitEquip(player, args[2])){
 										sender.sendMessage(ChatColor.DARK_GREEN + "gave kit to " + args[1].toLowerCase());

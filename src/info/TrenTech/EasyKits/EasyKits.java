@@ -1,6 +1,8 @@
 package info.TrenTech.EasyKits;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import net.milkbowl.vault.economy.Economy;
@@ -23,6 +25,7 @@ public class EasyKits extends JavaPlugin{
 	public static EasyKits plugin;
 	public final Logger log = Logger.getLogger("Minecraft");
 	public Economy economy;
+	public static HashMap<UUID, String> players = new HashMap<UUID, String>();
 	public boolean econSupport = true;
 	private CommandHandler cmdExecutor;
 	
@@ -58,21 +61,6 @@ public class EasyKits extends JavaPlugin{
 			DataSource.instance.createTable();
 			log.warning(String.format("[%s] Creating database!", new Object[] {getDescription().getName()}));
 		}
-		
-		if(!DataSource.instance.econColumnExist()){
-			DataSource.instance.createEconColumn();
-			log.warning(String.format("[%s] Upgrading database!", new Object[] {getDescription().getName()}));
-		}
-		
-		if(!DataSource.instance.cooldownColumnExist()){
-			DataSource.instance.createCooldownColumn();
-			log.warning(String.format("[%s] Upgrading database!", new Object[] {getDescription().getName()}));
-		}
-		
-		if(!DataSource.instance.maxUseColumnExist()){
-			DataSource.instance.createMaxUseColumn();
-			log.warning(String.format("[%s] Upgrading database!", new Object[] {getDescription().getName()}));
-		}
 			
     	if(getConfig().getString("Cooldown-Delay") != null){
     		getConfig().set("Cooldown-Delay", null);
@@ -82,6 +70,14 @@ public class EasyKits extends JavaPlugin{
 		if(getConfig().getString("Max-Number-Of-Uses") != null){
     		getConfig().set("Max-Number-Of-Uses", null);
     		saveConfig();
+		}
+		
+		String[] kits = DataSource.instance.getKitList();
+		for(String kit : kits){
+			if(DataSource.instance.getKitCooldown(kit) == null){
+				log.warning(String.format("[%s] Fixing table entry!", new Object[] {getDescription().getName()}));
+				DataSource.instance.setKitCooldown(kit, Integer.toString(0));
+			}	
 		}
 		
     }

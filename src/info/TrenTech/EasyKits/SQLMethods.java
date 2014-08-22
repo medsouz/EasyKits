@@ -13,84 +13,6 @@ public abstract class SQLMethods extends SQLUtils{
 	public boolean loaded = false;
     private Object lock = new Object();
 	
-	public boolean econColumnExist() {
-		boolean b = false;
-		try {
-			Statement statement = getConnection().createStatement();
-			DatabaseMetaData md = statement.getConnection().getMetaData();
-			ResultSet rs = md.getColumns(null, null, "kits" , "Price");
-			if (rs.next()){
-				b = true;	
-			}		
-		} catch (SQLException ex) { }
-		return b;
-	}
-	
-	public void createEconColumn(){
-		synchronized (lock) {
-			try {
-				PreparedStatement statement;	
-				statement = prepare("ALTER TABLE kits ADD Price DOUBLE");
-				statement.executeUpdate();
-			} catch (SQLException e) {
-				System.out.println("Unable to connect to Database!");
-				System.out.println(e.getMessage());
-			}
-		}	
-	}
-	
-	public boolean cooldownColumnExist() {
-		boolean b = false;
-		try {
-			Statement statement = getConnection().createStatement();
-			DatabaseMetaData md = statement.getConnection().getMetaData();
-			ResultSet rs = md.getColumns(null, null, "kits" , "Cooldown");
-			if (rs.next()){
-				b = true;	
-			}		
-		} catch (SQLException ex) { }
-		return b;
-	}
-	
-	public void createCooldownColumn(){
-		synchronized (lock) {
-			try {
-				PreparedStatement statement;	
-				statement = prepare("ALTER TABLE kits ADD Cooldown TEXT");
-				statement.executeUpdate();
-			} catch (SQLException e) {
-				System.out.println("Unable to connect to Database!");
-				System.out.println(e.getMessage());
-			}
-		}	
-	}
-	
-	public boolean maxUseColumnExist() {
-		boolean b = false;
-		try {
-			Statement statement = getConnection().createStatement();
-			DatabaseMetaData md = statement.getConnection().getMetaData();
-			ResultSet rs = md.getColumns(null, null, "kits" , "MaxUse");
-			if (rs.next()){
-				b = true;	
-			}		
-		} catch (SQLException ex) { }
-		return b;
-	}
-	
-	public void createMaxUseColumn(){
-		synchronized (lock) {
-			try {
-				PreparedStatement statement;	
-				statement = prepare("ALTER TABLE kits ADD MaxUse INTEGER");
-				statement.executeUpdate();
-			} catch (SQLException e) {
-				System.out.println("Unable to connect to Database!");
-				System.out.println(e.getMessage());
-			}
-		}	
-	}
-	
 	public boolean tableExist() {
 		boolean b = false;
 		try {
@@ -138,11 +60,12 @@ public abstract class SQLMethods extends SQLUtils{
 	public void createKit(String kitName, byte[] inv, byte[] armor) {
 		synchronized (lock) {
 			try {
-				PreparedStatement statement = prepare("INSERT into kits (Kit, Inventory, Armor, Price) VALUES (?, ?, ?, ?)");	
+				PreparedStatement statement = prepare("INSERT into kits (Kit, Inventory, Armor, Price, Cooldown) VALUES (?, ?, ?, ?, ?)");	
 				statement.setString(1, kitName);
 				statement.setBytes(2, inv);
 				statement.setBytes(3, armor);
 				statement.setDouble(4, 0);
+				statement.setDouble(5, 0);
 				statement.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Unable to connect to Database!");

@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -20,6 +21,7 @@ public class SignListener implements Listener{
 		this.plugin = plugin;
 	}
 
+	
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onSignUse(PlayerInteractEvent event) {
@@ -40,8 +42,7 @@ public class SignListener implements Listener{
 						player.updateInventory();
 					}else{
 						player.sendMessage(ChatColor.RED + "ERROR: Check your config!");
-					}
-					
+					}			
 				} else {
 					player.sendMessage(ChatColor.RED + line[1] + " Does Not Exist!");
 				}		
@@ -75,4 +76,22 @@ public class SignListener implements Listener{
 			
 		}
 	}
+	
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onSignBreak(BlockBreakEvent event) {
+		Material block = event.getBlock().getType();
+		Player player = event.getPlayer();
+		if ((block.equals(Material.SIGN_POST)) || (block.equals(Material.WALL_SIGN))) {
+			Sign sign = (Sign) event.getBlock().getState();
+			String[] line = sign.getLines();
+			String kit = ChatColor.DARK_BLUE + "[Kit]";
+			if (line[0].equalsIgnoreCase(kit)){
+				if(!player.hasPermission("EasyKits.sign")) {
+					event.setCancelled(true);
+					player.sendMessage(ChatColor.RED + "You Dont Not Have Permission to Break Kit Sign!");
+				}
+			}
+		}
+	}
+	
 }

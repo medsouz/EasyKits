@@ -2,6 +2,11 @@ package info.TrenTech.EasyKits;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.Map.Entry;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -69,5 +74,17 @@ public class Utils {
 			}			
 		}
 		return time;
+	}
+	
+	public static UUID getUUID(String playerName){
+		UUID uuid = null;
+		HashMap<UUID, String> players = EasyKits.players;
+		Set<Map.Entry<UUID, String>> keys = players.entrySet();
+		for(Entry<UUID, String> key : keys){
+			if(key.getValue().equalsIgnoreCase(playerName)){
+				uuid = key.getKey();
+			}
+		}
+		return uuid;
 	}
 }

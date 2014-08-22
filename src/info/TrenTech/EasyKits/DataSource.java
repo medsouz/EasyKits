@@ -241,7 +241,7 @@ public class DataSource extends SQLMethods{
 	
 	public boolean doMaxUseCheck(Player player, String kitName){
 		boolean b = true;		
-		File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
+		File file = new File(plugin.getDataFolder() + "/players/", player.getUniqueId() + ".yml");
 		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
 		if(playerConfig.getString(kitName.toLowerCase() + ".Max-Use") != null){
 			int playerMaxUse = playerConfig.getInt(kitName.toLowerCase() + ".Max-Use");
@@ -255,7 +255,7 @@ public class DataSource extends SQLMethods{
 	}
 
 	public void setMaxUse(Player player, String kitName){
-		File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
+		File file = new File(plugin.getDataFolder() + "/players/", player.getUniqueId() + ".yml");
 		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
 		int playerMaxUse = 0;
 		if(playerConfig.getString(kitName.toLowerCase() + ".Max-Use") != null){
@@ -271,7 +271,7 @@ public class DataSource extends SQLMethods{
 	
 	public boolean doCooldownCheck(Player player, String kitName){
 		boolean b = true;
-		File file = new File(plugin.getDataFolder() + "/players/", player.getName() + ".yml");
+		File file = new File(plugin.getDataFolder() + "/players/", player.getUniqueId() + ".yml");
 		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
 		if(playerConfig.getString(kitName.toLowerCase() + ".Cooldown") != null){
 			String playerKitCooldown = playerConfig.getString(kitName.toLowerCase() + ".Cooldown");
@@ -304,7 +304,7 @@ public class DataSource extends SQLMethods{
 	}
 	
 	public void setCooldown(String playerName, String kitName){
-		File file = new File(plugin.getDataFolder() + "/players/", playerName + ".yml");
+		File file = new File(plugin.getDataFolder() + "/players/", Utils.getUUID(playerName) + ".yml");
 		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
@@ -320,8 +320,7 @@ public class DataSource extends SQLMethods{
 	public boolean doPriceCheck(Player player, String kitName){
 		boolean b = true;
 		double price = getKitPrice(kitName.toLowerCase());
-		@SuppressWarnings("deprecation")
-		double balance = plugin.economy.getBalance(player.getName());
+		double balance = plugin.economy.getBalance(player);
 		if(balance < price){
 			b = false;
 			player.sendMessage(ChatColor.DARK_RED + "You need at least $" + price + "!");
@@ -329,11 +328,10 @@ public class DataSource extends SQLMethods{
 		return b;
 	}
 	
-	@SuppressWarnings("deprecation")
 	public void doKitCharge(Player player, String kitName){
 		double price = getKitPrice(kitName.toLowerCase());
 		if(price != 0){
-			plugin.economy.withdrawPlayer(player.getName(), price);
+			plugin.economy.withdrawPlayer(player, price);
 			player.sendMessage(ChatColor.DARK_GREEN + "Charged $" + price);
 		}
 	}
