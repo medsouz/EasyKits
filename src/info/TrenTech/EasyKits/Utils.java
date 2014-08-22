@@ -17,7 +17,9 @@ public class Utils {
 			if(!file.getParentFile().exists()) {
 				file.getParentFile().mkdirs();
 			}
-			file.createNewFile();
+			if(!file.exists()){
+				file.createNewFile();
+			}		
 			config.save(file);
 		} catch (IOException e) {
 			System.err.println("Error writing config");

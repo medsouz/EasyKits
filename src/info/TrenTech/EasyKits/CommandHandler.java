@@ -1,7 +1,6 @@
 package info.TrenTech.EasyKits;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -34,11 +33,7 @@ public class CommandHandler implements CommandExecutor {
 		                File[] files = folder.listFiles();
 					    for(File file : files){
 					    	YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
-							try {
-								playerConfig.save(file);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
+					    	Utils.saveConfig(file, playerConfig);
 					    }
 						DataSource.instance.dispose();
 						try {
@@ -198,6 +193,36 @@ public class CommandHandler implements CommandExecutor {
 						sender.sendMessage(ChatColor.DARK_RED + "Must be a player!");
 					}
 					
+				}else if(args[0].equalsIgnoreCase("reset")){
+					if(sender.hasPermission("EasyKits.cmd.reset")){
+						if(args.length == 4){
+							if(DataSource.instance.kitExist(args[2])){
+								if(args[1].equalsIgnoreCase("cooldown")){							
+									File file = new File(plugin.getDataFolder() + "/players/", Utils.getUUID(args[3]) + ".yml");
+									YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
+									playerConfig.set(args[2].toLowerCase() + ".Cooldown", null);
+									Utils.saveConfig(file, playerConfig);
+									sender.sendMessage(ChatColor.GREEN + "Cooldown reset for " + args[3]);
+								}else if(args[1].equalsIgnoreCase("maxuse")){
+									File file = new File(plugin.getDataFolder() + "/players/", Utils.getUUID(args[3]) + ".yml");				
+									YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
+									playerConfig.set(args[2].toLowerCase() + ".Max-Use", null);
+									Utils.saveConfig(file, playerConfig);
+									sender.sendMessage(ChatColor.GREEN + "MaxUse reset for " + args[3]);
+								}else{
+									sender.sendMessage(ChatColor.YELLOW + "/kit reset cooldown [kit] [player]");
+									sender.sendMessage(ChatColor.YELLOW + "/kit reset maxuse [kit] [player]");
+								}
+							}else{
+								sender.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
+							}
+						}else{
+							sender.sendMessage(ChatColor.YELLOW + "/kit reset cooldown [kit] [player]");
+							sender.sendMessage(ChatColor.YELLOW + "/kit reset maxuse [kit] [player]");
+						}
+					}else{
+						sender.sendMessage(ChatColor.DARK_RED + "You do not have Permission");
+					}
 				}else if(args.length == 1){				
 					if(sender instanceof Player){
 						Player player = (Player)sender;

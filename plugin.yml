@@ -1,6 +1,6 @@
 name: EasyKits
 main: info.TrenTech.EasyKits.EasyKits
-version: 1.4.9
+version: 1.5.0
 commands:
   kit:
     usage: /<command>

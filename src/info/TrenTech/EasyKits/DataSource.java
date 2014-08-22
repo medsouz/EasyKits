@@ -229,7 +229,7 @@ public class DataSource extends SQLMethods{
 					setMaxUse(player, kitName.toLowerCase());
 				}
 				if(cooldown){
-					setCooldown(player.getName(), kitName.toLowerCase());
+					setCooldown(player, kitName.toLowerCase());
 				}
 				if(charge){
 					doKitCharge(player, kitName.toLowerCase());
@@ -262,11 +262,7 @@ public class DataSource extends SQLMethods{
 			playerMaxUse = playerConfig.getInt(kitName + ".Max-Use");
 		}
 		playerConfig.set(kitName.toLowerCase() + ".Max-Use", playerMaxUse + 1);
-		try {
-			playerConfig.save(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Utils.saveConfig(file, playerConfig);
 	}
 	
 	public boolean doCooldownCheck(Player player, String kitName){
@@ -303,18 +299,14 @@ public class DataSource extends SQLMethods{
 		return b;
 	}
 	
-	public void setCooldown(String playerName, String kitName){
-		File file = new File(plugin.getDataFolder() + "/players/", Utils.getUUID(playerName) + ".yml");
+	public void setCooldown(Player player, String kitName){
+		File file = new File(plugin.getDataFolder() + "/players/", player.getUniqueId() + ".yml");
 		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 		String strDate = dateFormat.format(date).toString();
 		playerConfig.set(kitName.toLowerCase() + ".Cooldown", strDate);
-		try {
-			playerConfig.save(file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Utils.saveConfig(file, playerConfig);
 	}
 	
 	public boolean doPriceCheck(Player player, String kitName){
