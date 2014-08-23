@@ -44,7 +44,7 @@ public class CommandHandler implements CommandExecutor {
 						sender.sendMessage(ChatColor.DARK_GREEN + "EasyKits Reloaded!");
 					}else{
 						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
-					}				
+					}
 				}else if(args[0].equalsIgnoreCase("create")){
 					if(sender instanceof Player){
 						Player player = (Player) sender;

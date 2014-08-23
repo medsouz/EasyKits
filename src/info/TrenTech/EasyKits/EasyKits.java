@@ -1,6 +1,7 @@
 package info.TrenTech.EasyKits;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -10,6 +11,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -26,6 +28,7 @@ public class EasyKits extends JavaPlugin{
 	public final Logger log = Logger.getLogger("Minecraft");
 	public Economy economy;
 	public static HashMap<UUID, String> players = new HashMap<UUID, String>();
+//	public static HashMap<String, UUID> players2 = new HashMap<String, UUID>();
 	public boolean econSupport = true;
 	private CommandHandler cmdExecutor;
 	
@@ -79,6 +82,11 @@ public class EasyKits extends JavaPlugin{
 				DataSource.instance.setKitCooldown(kit, Integer.toString(0));
 			}	
 		}
+		
+		Collection<? extends Player> onlinePlayers = getServer().getOnlinePlayers();
+    	for(Player player : onlinePlayers){
+    		players.put(player.getUniqueId(), player.getName());
+    	}
 		
     }
     
