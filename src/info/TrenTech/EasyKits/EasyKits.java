@@ -28,7 +28,6 @@ public class EasyKits extends JavaPlugin{
 	public final Logger log = Logger.getLogger("Minecraft");
 	public Economy economy;
 	public static HashMap<UUID, String> players = new HashMap<UUID, String>();
-//	public static HashMap<String, UUID> players2 = new HashMap<String, UUID>();
 	public boolean econSupport = true;
 	private CommandHandler cmdExecutor;
 	
@@ -122,8 +121,12 @@ public class EasyKits extends JavaPlugin{
 		Plugin plugin = getServer().getPluginManager().getPlugin("Vault");
 		if(plugin != null){
 			RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(Economy.class);
-			economy = (Economy) economyProvider.getProvider();
-			return true;
+			try{		
+				economy = (Economy) economyProvider.getProvider();
+				return true;
+			}catch(NullPointerException e){
+				return false;
+			}
 		}else{
 			return false;
 		}

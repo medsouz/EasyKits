@@ -188,6 +188,7 @@ public class DataSource extends SQLMethods{
 	}
 	
 	public void revertChanges(Player player, ItemStack[] oldInv, ItemStack[] oldArm){
+		player.getInventory().clear();
 		player.getInventory().setContents(oldInv);
 		player.getInventory().setArmorContents(oldArm);
 		player.sendMessage(ChatColor.DARK_RED + "Insufficient inventory space!");

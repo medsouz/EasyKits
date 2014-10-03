@@ -10,7 +10,6 @@ import java.util.List;
 
 public abstract class SQLMethods extends SQLUtils{
 
-	public boolean loaded = false;
     private Object lock = new Object();
 	
 	public boolean tableExist() {
