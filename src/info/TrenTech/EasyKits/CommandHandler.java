@@ -1,6 +1,7 @@
 package info.TrenTech.EasyKits;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
@@ -29,6 +30,13 @@ public class CommandHandler implements CommandExecutor {
 					if(sender.hasPermission("EasyKits.cmd.reload")){
 						this.plugin.reloadConfig();
 						this.plugin.saveConfig();
+						File msgfile = new File(this.plugin.getDataFolder(), "messages.yml");
+						YamlConfiguration messages = YamlConfiguration.loadConfiguration(msgfile);
+						try {
+							messages.save(msgfile);
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
 		                File folder = new File(plugin.getDataFolder() + "/players/");
 		                File[] files = folder.listFiles();
 					    for(File file : files){
@@ -43,7 +51,8 @@ public class CommandHandler implements CommandExecutor {
 						}
 						sender.sendMessage(ChatColor.DARK_GREEN + "EasyKits Reloaded!");
 					}else{
-						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+						Notifications notify = new Notifications("Permission-Denied", 0, null);
+						sender.sendMessage(notify.getMessage());
 					}
 				}else if(args[0].equalsIgnoreCase("create")){
 					if(sender instanceof Player){
@@ -56,14 +65,16 @@ public class CommandHandler implements CommandExecutor {
 									DataSource.instance.saveKit(args[1].toLowerCase(), inv, arm);
 									player.sendMessage(ChatColor.DARK_GREEN + "Kit saved!");
 								}else{
-									player.sendMessage(ChatColor.DARK_RED + args[1] + " already exists!");
+									Notifications notify = new Notifications("Kit-Exist", 0, args[1]);
+									sender.sendMessage(notify.getMessage());
 								}
 							}else{
 								player.sendMessage(ChatColor.YELLOW + "/kit create [kitname]");
 								player.sendMessage(ChatColor.YELLOW + "/kit create [kitname]");
 							}
 						}else{
-							sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+							Notifications notify = new Notifications("Permission-Denied", 0, null);
+							sender.sendMessage(notify.getMessage());
 						}
 					}else{
 						sender.sendMessage(ChatColor.DARK_RED + "Must be a player!");
@@ -75,13 +86,15 @@ public class CommandHandler implements CommandExecutor {
 								DataSource.instance.setKitCooldown(args[1].toLowerCase(), args[2]);
 								sender.sendMessage(ChatColor.DARK_GREEN + "Kit cooldown set to " + args[2]);
 							}else{
-								sender.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
+								Notifications notify = new Notifications("Kit-Not-Exist", 0, args[0]);
+								sender.sendMessage(notify.getMessage());
 							}
 						}else{
 							sender.sendMessage(ChatColor.YELLOW + "/kit cooldown [kitname] [cooldown]");
 						}
 					}else{
-						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+						Notifications notify = new Notifications("Permission-Denied", 0, null);
+						sender.sendMessage(notify.getMessage());
 					}
 				}else if(args[0].equalsIgnoreCase("maxuse")){
 					if(sender.hasPermission("EasyKits.cmd.create")){
@@ -90,13 +103,15 @@ public class CommandHandler implements CommandExecutor {
 								DataSource.instance.setKitMaxUse(args[1].toLowerCase(), Integer.parseInt(args[2]));
 								sender.sendMessage(ChatColor.DARK_GREEN + "Kit max-use set to " + args[2]);
 							}else{
-								sender.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
+								Notifications notify = new Notifications("Kit-Not-Exist", 0, args[0]);
+								sender.sendMessage(notify.getMessage());
 							}
 						}else{
 							sender.sendMessage(ChatColor.YELLOW + "/kit maxuse [kitname] [max-use]");
 						}
 					}else{
-						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+						Notifications notify = new Notifications("Permission-Denied", 0, null);
+						sender.sendMessage(notify.getMessage());
 					}
 				}else if(args[0].equalsIgnoreCase("price")){
 					if(sender.hasPermission("EasyKits.cmd.create")){
@@ -105,13 +120,15 @@ public class CommandHandler implements CommandExecutor {
 								DataSource.instance.setKitPrice(args[1].toLowerCase(), Double.parseDouble(args[2]));
 								sender.sendMessage(ChatColor.DARK_GREEN + "Kit price set to $" + args[2]);
 							}else{
-								sender.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
+								Notifications notify = new Notifications("Kit-Not-Exist", 0, args[0]);
+								sender.sendMessage(notify.getMessage());
 							}
 						}else{
 							sender.sendMessage(ChatColor.YELLOW + "/kit price [kitname] [price]");
 						}
 					}else{
-						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+						Notifications notify = new Notifications("Permission-Denied", 0, null);
+						sender.sendMessage(notify.getMessage());
 					}					
 				}else if(args[0].equalsIgnoreCase("remove")){
 					if(sender.hasPermission("EasyKits.cmd.remove")){
@@ -126,7 +143,8 @@ public class CommandHandler implements CommandExecutor {
 							sender.sendMessage(ChatColor.YELLOW + "/kit remove [kitname]");
 						}
 					}else{
-						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+						Notifications notify = new Notifications("Permission-Denied", 0, null);
+						sender.sendMessage(notify.getMessage());
 					}					
 				}else if(args[0].equalsIgnoreCase("give")){
 					if(sender.hasPermission("EasyKits.cmd.give")){
@@ -142,7 +160,8 @@ public class CommandHandler implements CommandExecutor {
 										sender.sendMessage(ChatColor.DARK_RED + "Player has insufficient inventory space!");
 									}
 								}else{
-									sender.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
+									Notifications notify = new Notifications("Kit-Not-Exist", 0, args[0]);
+									sender.sendMessage(notify.getMessage());
 								}
 							}else{
 								sender.sendMessage(ChatColor.DARK_RED + "Player does not exist! Make sure they are online!");
@@ -151,7 +170,8 @@ public class CommandHandler implements CommandExecutor {
 							sender.sendMessage(ChatColor.YELLOW + "/kit give [player] [kitname]");
 						}
 					}else{
-						sender.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+						Notifications notify = new Notifications("Permission-Denied", 0, null);
+						sender.sendMessage(notify.getMessage());
 					}					
 				}else if(args[0].equalsIgnoreCase("book")){
 					if(sender instanceof Player){
@@ -159,7 +179,8 @@ public class CommandHandler implements CommandExecutor {
 						if(player.hasPermission("EasyKits.cmd.list")){
 							player.getInventory().addItem(EasyKits.getCustomItem(Items.Kits));
 						}else{
-							player.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+							Notifications notify = new Notifications("Permission-Denied", 0, null);
+							sender.sendMessage(notify.getMessage());
 						}
 					}else{
 						sender.sendMessage(ChatColor.DARK_RED + "Must be a player!");
@@ -179,7 +200,8 @@ public class CommandHandler implements CommandExecutor {
 							}					
 						}						
 					}else{
-						sender.sendMessage(ChatColor.DARK_RED + "You do not have Permission");
+						Notifications notify = new Notifications("Permission-Denied", 0, null);
+						sender.sendMessage(notify.getMessage());
 					}
 				}else if(args[0].equalsIgnoreCase("show")){
 					if(sender instanceof Player){
@@ -214,14 +236,16 @@ public class CommandHandler implements CommandExecutor {
 									sender.sendMessage(ChatColor.YELLOW + "/kit reset maxuse [kit] [player]");
 								}
 							}else{
-								sender.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
+								Notifications notify = new Notifications("Kit-Not-Exist", 0, args[0]);
+								sender.sendMessage(notify.getMessage());
 							}
 						}else{
 							sender.sendMessage(ChatColor.YELLOW + "/kit reset cooldown [kit] [player]");
 							sender.sendMessage(ChatColor.YELLOW + "/kit reset maxuse [kit] [player]");
 						}
 					}else{
-						sender.sendMessage(ChatColor.DARK_RED + "You do not have Permission");
+						Notifications notify = new Notifications("Permission-Denied", 0, null);
+						sender.sendMessage(notify.getMessage());
 					}
 				}else if(args.length == 1){				
 					if(sender instanceof Player){
@@ -229,7 +253,8 @@ public class CommandHandler implements CommandExecutor {
 						if(DataSource.instance.kitExist(args[0].toLowerCase())){				
 							DataSource.instance.doKitEquipCheck(player, args[0].toLowerCase());
 						}else{
-							player.sendMessage(ChatColor.DARK_RED + "Kit does not exist!");
+							Notifications notify = new Notifications("Kit-Not-Exist", 0, args[0]);
+							sender.sendMessage(notify.getMessage());
 						}
 					}else{
 						sender.sendMessage(ChatColor.DARK_RED + "Must be a player!");

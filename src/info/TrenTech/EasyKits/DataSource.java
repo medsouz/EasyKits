@@ -86,112 +86,123 @@ public class DataSource extends SQLMethods{
 	public boolean kitEquip(Player player, String kitName){
 		ItemStack[] inv = getKitInventory(kitName.toLowerCase());
 		ItemStack[] arm = getKitArmor(kitName.toLowerCase());
-		ItemStack[] oldInv = player.getInventory().getContents();
-		ItemStack[] oldArm = player.getInventory().getArmorContents();
-		int indexInv = 0;
+		Inventory tempInv = plugin.getServer().createInventory(player, 36);
+		Inventory tempArm = plugin.getServer().createInventory(player, 9);
+		tempInv.setContents(player.getInventory().getContents());
+		tempArm.setContents(player.getInventory().getArmorContents());
+		int index = 0;
 		for(ItemStack item : inv){
-			if(player.getInventory().getItem(indexInv) == null){
-				if(item == null){
-					item = new ItemStack(Material.AIR);
-				}
-				player.getInventory().setItem(indexInv, item);
-			}else if(player.getInventory().firstEmpty() > -1){
-				if(item == null){
-					item = new ItemStack(Material.AIR);
-				}
-				player.getInventory().addItem(item);				
+			if(item == null){
+				item = new ItemStack(Material.AIR);
+			}
+			if(tempInv.getItem(index) == null){
+				tempInv.setItem(index, item);
+			}else if(tempInv.firstEmpty() > -1){
+				tempInv.addItem(item);			
 			}else{
-				if(item == null){
-					item = new ItemStack(Material.AIR);
-				}
 				int amount = item.getAmount();
-				HashMap<Integer, ? extends ItemStack> matchItem = player.getInventory().all(item);
+				HashMap<Integer, ? extends ItemStack> matchItem = player.getInventory().all(item);				
 				int size = matchItem.size();
 				if(size < item.getMaxStackSize()){
 					size = item.getMaxStackSize() - size;
 					if(amount <= size){
-						player.getInventory().setItem(indexInv, item);
+						tempInv.setItem(index, item);
 					}else{
-						revertChanges(player, oldInv, oldArm );
+						Notifications notify = new Notifications("Inventory-Space", 0, null);
+						player.sendMessage(notify.getMessage());
 						return false;					
 					}
 				}else{
 					for(int i = 10; i <= 36; i++){
 						if(i == 36){
-							revertChanges(player, oldInv, oldArm );
+							Notifications notify = new Notifications("Inventory-Space", 0, null);
+							player.sendMessage(notify.getMessage());
 							return false;
 						}
 						size = size - item.getMaxStackSize();
 						if(size < item.getMaxStackSize()){
-							if(amount <= size){
-								player.getInventory().setItem(indexInv, item);
+							if(amount <= size){					
+								tempInv.setItem(index, item);
 							}
 						}
 					}
-				}				
+					Notifications notify = new Notifications("Inventory-Space", 0, null);
+					player.sendMessage(notify.getMessage());
+					return false;
+				}
 			}
-			indexInv++;
+			index++;
 		}
-		int index = 0;
+		index = 0;
 		for(ItemStack item : arm){
 			if(index == 0){
 				if(item != null){
-					if(player.getInventory().getBoots() == null){
-						player.getInventory().setBoots(item);
-					}else if(player.getInventory().firstEmpty() > -1){
-						player.getInventory().addItem(item);
+					if(tempArm.getItem(0) == null){
+						tempArm.setItem(0, item);
+					}else if(tempInv.firstEmpty() > -1){
+						tempInv.addItem(item);
 					}else{
-						revertChanges(player, oldInv, oldArm );
+						Notifications notify = new Notifications("Inventory-Space", 0, null);
+						player.sendMessage(notify.getMessage());
 						return false;
 					}
 				}
 			}
 			if(index == 1){
 				if(item != null){
-					if(player.getInventory().getLeggings() == null){
-						player.getInventory().setLeggings(item);
-					}else if(player.getInventory().firstEmpty() > -1){
-						player.getInventory().addItem(item);
+					if(tempArm.getItem(1) == null){
+						tempArm.setItem(1, item);
+					}else if(tempInv.firstEmpty() > -1){
+						tempInv.addItem(item);
 					}else{
-						revertChanges(player, oldInv, oldArm );
+						Notifications notify = new Notifications("Inventory-Space", 0, null);
+						player.sendMessage(notify.getMessage());
 						return false;
 					}
 				}
 			}
 			if(index == 2){
 				if(item != null){
-					if(player.getInventory().getChestplate() == null){
-						player.getInventory().setChestplate(item);
-					}else if(player.getInventory().firstEmpty() > -1){
-						player.getInventory().addItem(item);
+					if(tempArm.getItem(2) == null){
+						tempArm.setItem(2, item);
+					}else if(tempInv.firstEmpty() > -1){
+						tempInv.addItem(item);
 					}else{
-						revertChanges(player, oldInv, oldArm );
+						Notifications notify = new Notifications("Inventory-Space", 0, null);
+						player.sendMessage(notify.getMessage());
 						return false;
 					}
 				}
 			}
 			if(index == 3){
 				if(item != null){
-					if(player.getInventory().getHelmet() == null){
-						player.getInventory().setHelmet(item);
-					}else if(player.getInventory().firstEmpty() > -1){
-						player.getInventory().addItem(item);
+					if(tempArm.getItem(3) == null){
+						tempArm.setItem(3, item);
+					}else if(tempInv.firstEmpty() > -1){
+						tempInv.addItem(item);
 					}else{
-						revertChanges(player, oldInv, oldArm );
+						Notifications notify = new Notifications("Inventory-Space", 0, null);
+						player.sendMessage(notify.getMessage());
 						return false;
 					}
 				}
 			}
-			index++;			
+			index++;
+		}
+		player.getInventory().setContents(tempInv.getContents());
+		if(tempArm.getItem(0) != null){
+			player.getInventory().setBoots(tempArm.getItem(0));
+		}
+		if(tempArm.getItem(1) != null){
+			player.getInventory().setLeggings(tempArm.getItem(1));
+		}
+		if(tempArm.getItem(2) != null){
+			player.getInventory().setChestplate(tempArm.getItem(2));
+		}
+		if(tempArm.getItem(3) != null){
+			player.getInventory().setHelmet(tempArm.getItem(3));
 		}
 		return true;
-	}
-	
-	public void revertChanges(Player player, ItemStack[] oldInv, ItemStack[] oldArm){
-		player.getInventory().clear();
-		player.getInventory().setContents(oldInv);
-		player.getInventory().setArmorContents(oldArm);
-		player.sendMessage(ChatColor.DARK_RED + "Insufficient inventory space!");
 	}
 	
 	public void doKitEquipCheck(final Player player, final String kitName){
@@ -200,7 +211,8 @@ public class DataSource extends SQLMethods{
 		boolean charge = true;		
 		boolean pass = true;
 		if(!player.hasPermission("EasyKits.kits." + kitName.toLowerCase())){
-			player.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
+			Notifications notify = new Notifications("Permission-Denied", 0, kitName);
+			player.sendMessage(notify.getMessage());
 			pass = false;
 		}
 		if(player.hasPermission("EasyKits.kits.maxuse") && !player.isOp()){
@@ -235,7 +247,8 @@ public class DataSource extends SQLMethods{
 				if(charge){
 					doKitCharge(player, kitName.toLowerCase());
 				}
-				player.sendMessage(ChatColor.DARK_GREEN + "Kit equipped!");
+				Notifications notify = new Notifications("Kit-Equip", 0, kitName);
+				player.sendMessage(notify.getMessage());
 			}
 		}
 	}
@@ -248,7 +261,8 @@ public class DataSource extends SQLMethods{
 			int playerMaxUse = playerConfig.getInt(kitName.toLowerCase() + ".Max-Use");
 			int kitMaxUse = getKitMaxUse(kitName.toLowerCase());
 			if(playerMaxUse >= kitMaxUse && kitMaxUse != 0){
-				player.sendMessage(ChatColor.DARK_RED + "You have reached the max number of uses for this kit!");
+				Notifications notify = new Notifications("Max-Use", 0, kitName);
+				player.sendMessage(notify.getMessage());
 				b = false;
 			}
 		}	
@@ -294,7 +308,8 @@ public class DataSource extends SQLMethods{
 			if(!(time - compare <= 0)){
 				b = false;
 				String remaining = Utils.formatTime((int) (time - compare));
-				player.sendMessage(ChatColor.DARK_RED + "You must wait " + remaining + " before you can use this kit again!");
+				Notifications notify = new Notifications("Cooldown", 0, remaining);
+				player.sendMessage(notify.getMessage());
 			}
 		}
 		return b;
@@ -316,7 +331,8 @@ public class DataSource extends SQLMethods{
 		double balance = plugin.economy.getBalance(player);
 		if(balance < price){
 			b = false;
-			player.sendMessage(ChatColor.DARK_RED + "You need at least $" + price + "!");
+			Notifications notify = new Notifications("Insufficient-Funds", price, kitName);
+			player.sendMessage(notify.getMessage());
 		}
 		return b;
 	}
@@ -325,7 +341,8 @@ public class DataSource extends SQLMethods{
 		double price = getKitPrice(kitName.toLowerCase());
 		if(price != 0){
 			plugin.economy.withdrawPlayer(player, price);
-			player.sendMessage(ChatColor.DARK_GREEN + "Charged $" + price);
+			Notifications notify = new Notifications("Money-Charged", price, kitName);
+			player.sendMessage(notify.getMessage());
 		}
 	}
 	
@@ -353,9 +370,12 @@ public class DataSource extends SQLMethods{
 					player.openInventory(showInv);					
 				}
 			}else{
-				player.sendMessage(ChatColor.DARK_RED + "Kit does not Exist!");
+				Notifications notify = new Notifications("Kit-Not-Exist", 0, kitName);
+				player.sendMessage(notify.getMessage());
 			}
 		}else{
+			Notifications notify = new Notifications("Permission-Denied", 0, kitName);
+			player.sendMessage(notify.getMessage());
 			player.sendMessage(ChatColor.DARK_RED + "You do not have permission!");
 		}
 	}

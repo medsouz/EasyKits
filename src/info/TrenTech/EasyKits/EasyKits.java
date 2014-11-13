@@ -1,5 +1,7 @@
 package info.TrenTech.EasyKits;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -30,17 +33,42 @@ public class EasyKits extends JavaPlugin{
 	public static HashMap<UUID, String> players = new HashMap<UUID, String>();
 	public boolean econSupport = true;
 	private CommandHandler cmdExecutor;
+	public static HashMap<String, String> messages = new HashMap<String, String>();
 	
     @Override
     public void onEnable(){
 
     	new DataSource(this);
-    	
+    	new Notifications(this);
     	registerEvents(this, new EventListener(this), new SignListener(this));
     	
     	getConfig().options().copyDefaults(true);
     	saveConfig();
-    
+    	
+		File file = new File(getDataFolder(), "messages.yml");
+		YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
+		if(!file.exists()){		
+			config.set("Permission-Denied", "&4You do not have Permission");
+			config.set("Kit-Equip", "&2%K equipped!");
+			config.set("Kit-Exist", "&4%K already exists!");
+			config.set("Kit-Not-Exist", "&4%K does not exist!");
+			config.set("Max-Use", "&4You have reached the max number of uses for this kit!");
+			config.set("Cooldown", "&4You must wait %T before you can use this kit again!");
+			config.set("Insufficient-Funds", "&4You need at least $%M");
+			config.set("Money-Charged", "&2Charged $%M");
+			config.set("Inventory-Space", "&4Insufficient inventory space!");
+			config.set("First-Join-Kit", "&2Have a kit to get you started!");
+			config.set("Kit-Book-Full", "&5There are more kits than can fit in the book. Use /kit list!");	
+			try {
+				config.save(file);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		Notifications notify = new Notifications(this, config);
+		notify.getMessages();
+		
 		this.cmdExecutor = new CommandHandler(this);
 		getCommand("kit").setExecutor(cmdExecutor);
 		

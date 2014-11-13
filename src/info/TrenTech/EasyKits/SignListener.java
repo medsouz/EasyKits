@@ -44,7 +44,8 @@ public class SignListener implements Listener{
 						player.sendMessage(ChatColor.RED + "ERROR: Check your config!");
 					}			
 				} else {
-					player.sendMessage(ChatColor.RED + line[1] + " Does Not Exist!");
+					Notifications notify = new Notifications("Kit-Not-Exist", 0, line[1]);
+					player.sendMessage(notify.getMessage());
 				}		
 			}
 		}
@@ -67,13 +68,14 @@ public class SignListener implements Listener{
 					event.setLine(3, null);
 				} else {
 					event.setCancelled(true);
-					player.sendMessage(ChatColor.RED + "You Do Not Have Permission!");
+					Notifications notify = new Notifications("Permission-Denied", 0, kitName);
+					player.sendMessage(notify.getMessage());
 				}
 			} else {
 				event.setCancelled(true);
-				event.getPlayer().sendMessage(ChatColor.RED + line[1] + " Does Not Exist!");
-			}
-			
+				Notifications notify = new Notifications("Kit-Not-Exist", 0, line[1]);
+				player.sendMessage(notify.getMessage());
+			}		
 		}
 	}
 	
@@ -88,7 +90,8 @@ public class SignListener implements Listener{
 			if (line[0].equalsIgnoreCase(kit)){
 				if(!player.hasPermission("EasyKits.sign")) {
 					event.setCancelled(true);
-					player.sendMessage(ChatColor.RED + "You Dont Not Have Permission to Break Kit Sign!");
+					Notifications notify = new Notifications("Permission-Denied", 0, null);
+					player.sendMessage(notify.getMessage());
 				}
 			}
 		}

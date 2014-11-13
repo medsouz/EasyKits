@@ -61,28 +61,18 @@ public class EventListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLoginEvent(PlayerJoinEvent event){
 		Player player = event.getPlayer();
-		EasyKits.players.put(player.getUniqueId(), player.getName());
-//		HashMap<String, UUID> players2 = EasyKits.players2;
-//		Set<Map.Entry<String, UUID>> values = players2.entrySet();
-//		for(Entry<String, UUID> value : values){
-//			if(value.getValue() == player.getUniqueId()){
-//				String playerName = value.getKey();
-//				if(!playerName.equalsIgnoreCase(player.getName())){
-//					players2.remove(playerName);
-//					players2.put(player.getName(), player.getUniqueId());
-//				}
-//			}
-//		}		
+		EasyKits.players.put(player.getUniqueId(), player.getName());	
 		File file = new File(this.plugin.getDataFolder() + "/players/", player.getUniqueId() + ".yml");
 		YamlConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
 		playerConfig.set("Player", player.getName());
 		Utils.saveConfig(file, playerConfig);
 		String joinKit = this.plugin.getConfig().getString("First-Join-Kit");
 		if(!player.hasPlayedBefore()) {		
-			 if(DataSource.instance.kitExist(joinKit)){
-				 player.sendMessage(ChatColor.DARK_GREEN + "Have a kit to get you started!");
-				 DataSource.instance.kitEquip(player, joinKit);
-			 }
+			if(DataSource.instance.kitExist(joinKit)){
+				Notifications notify = new Notifications("First-Join-Kit", 0, null);
+				player.sendMessage(notify.getMessage());
+				DataSource.instance.kitEquip(player, joinKit);
+			}
 		}		
 	}
 	
@@ -131,6 +121,8 @@ public class EventListener implements Listener {
 					}						
 					player.openInventory(kitInv);
 					if(warning == true){
+						Notifications notify = new Notifications("Kit-Book-Full", 0, null);
+						player.sendMessage(notify.getMessage());
 						player.sendMessage(ChatColor.DARK_PURPLE + "There are more kits than can fit in the book. Use /kit list!");
 					}
 				}
