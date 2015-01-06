@@ -150,7 +150,7 @@ public class CommandHandler implements CommandExecutor {
 					if(sender.hasPermission("EasyKits.cmd.give")){
 						if(args.length == 3){
 							UUID uuid = Utils.getUUID(args[1]);
-							if(this.plugin.getServer().getPlayer(uuid).isOnline()){
+							if(uuid != null){
 								Player player = this.plugin.getServer().getPlayer(uuid);
 								if(DataSource.instance.kitExist(args[2])){
 									if(DataSource.instance.kitEquip(player, args[2])){

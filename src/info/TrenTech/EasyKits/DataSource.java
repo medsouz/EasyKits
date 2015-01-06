@@ -186,6 +186,7 @@ public class DataSource extends SQLMethods{
 						return false;
 					}
 				}
+				break;
 			}
 			index++;
 		}
