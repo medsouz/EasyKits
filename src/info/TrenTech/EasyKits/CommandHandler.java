@@ -264,18 +264,28 @@ public class CommandHandler implements CommandExecutor {
 			}else{
 				sender.sendMessage(ChatColor.DARK_GREEN + "Command List:");
 				sender.sendMessage(ChatColor.YELLOW + "/kit -or- /easykits -or- /k");
-				sender.sendMessage(ChatColor.YELLOW + "/kit create [kitname]");
-				sender.sendMessage(ChatColor.YELLOW + "/kit remove [kitname]");
-				sender.sendMessage(ChatColor.YELLOW + "/kit maxuse [kitname] [cooldown]");
-				sender.sendMessage(ChatColor.YELLOW + "/kit cooldown [kitname] [cooldown]");
-				sender.sendMessage(ChatColor.YELLOW + "/kit reset [cooldown/maxuse] [kit] [player]");
-				sender.sendMessage(ChatColor.YELLOW + "/kit price [kitname] [price]");
-				sender.sendMessage(ChatColor.YELLOW + "/kit book");
-				sender.sendMessage(ChatColor.YELLOW + "/kit list");
-				sender.sendMessage(ChatColor.YELLOW + "/kit show [kitname]");
 				sender.sendMessage(ChatColor.YELLOW + "/kit [kitname]");
-				sender.sendMessage(ChatColor.YELLOW + "/kit give [player] [kitname]");
-				sender.sendMessage(ChatColor.YELLOW + "/kit reload");
+				if(sender.hasPermission("EasyKits.cmd.give"))
+					sender.sendMessage(ChatColor.YELLOW + "/kit give [player] [kitname]");
+				if(sender.hasPermission("EasyKits.cmd.list")){
+					sender.sendMessage(ChatColor.YELLOW + "/kit book");
+					sender.sendMessage(ChatColor.YELLOW + "/kit list");
+				}
+				if(sender.hasPermission("EasyKits.cmd.show"))
+					sender.sendMessage(ChatColor.YELLOW + "/kit show [kitname]");
+				
+				if(sender.hasPermission("EasyKits.cmd.create")){
+					sender.sendMessage(ChatColor.YELLOW + "/kit create [kitname]");
+					sender.sendMessage(ChatColor.YELLOW + "/kit maxuse [kitname] [cooldown]");
+					sender.sendMessage(ChatColor.YELLOW + "/kit cooldown [kitname] [cooldown]");
+					sender.sendMessage(ChatColor.YELLOW + "/kit price [kitname] [price]");
+				}
+				if(sender.hasPermission("EasyKits.cmd.remove"))
+					sender.sendMessage(ChatColor.YELLOW + "/kit remove [kitname]");
+				if(sender.hasPermission("EasyKits.cmd.reset"))
+					sender.sendMessage(ChatColor.YELLOW + "/kit reset [cooldown/maxuse] [kit] [player]");
+				if(sender.hasPermission("EasyKits.cmd.reload"))
+					sender.sendMessage(ChatColor.YELLOW + "/kit reload");
 			}
 		}
 		return true;
