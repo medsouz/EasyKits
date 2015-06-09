@@ -352,22 +352,25 @@ public class DataSource extends SQLMethods{
 			if(DataSource.instance.kitExist(kitName)){
 				ItemStack[] inv = DataSource.instance.getKitInventory(kitName.toLowerCase());
 				ItemStack[] arm = DataSource.instance.getKitArmor(kitName.toLowerCase());
-				if(player.hasPermission("EasyKits.kits." + kitName.toLowerCase()) && !kitName.toLowerCase().equalsIgnoreCase(plugin.getConfig().getString("First-Join-Kit"))){
+				boolean canUseKit = player.hasPermission("EasyKits.kits." + kitName.toLowerCase());
+				if((canUseKit || player.hasPermission("EasyKits.show." + kitName.toLowerCase())) && !kitName.toLowerCase().equalsIgnoreCase(plugin.getConfig().getString("First-Join-Kit"))){
 					Inventory showInv = plugin.getServer().createInventory(player, 45, "EasyKits Kit: " + kitName.toLowerCase());
 					showInv.setContents(inv);								
 					int index = 36;
 					for(ItemStack a : arm){
 						showInv.setItem(index, a);
 						index++;
-					}	
-					ItemStack getKit = new ItemStack(Material.NETHER_STAR);
-					ItemMeta getKitMeta = getKit.getItemMeta();
-					getKitMeta.setDisplayName(ChatColor.GREEN + "Get " + kitName.toLowerCase());
-					ArrayList<String> getKitLores = new ArrayList<String>();
-					getKitLores.add(ChatColor.DARK_PURPLE+ "Click to equip kit!");
-					getKitMeta.setLore(getKitLores);
-					getKit.setItemMeta(getKitMeta);								
-					showInv.setItem(44, getKit);
+					}
+					if(canUseKit){
+						ItemStack getKit = new ItemStack(Material.NETHER_STAR);
+						ItemMeta getKitMeta = getKit.getItemMeta();
+						getKitMeta.setDisplayName(ChatColor.GREEN + "Get " + kitName.toLowerCase());
+						ArrayList<String> getKitLores = new ArrayList<String>();
+						getKitLores.add(ChatColor.DARK_PURPLE+ "Click to equip kit!");
+						getKitMeta.setLore(getKitLores);
+						getKit.setItemMeta(getKitMeta);
+						showInv.setItem(44, getKit);
+					}
 					player.openInventory(showInv);					
 				}
 			}else{
